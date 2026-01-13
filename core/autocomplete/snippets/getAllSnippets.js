@@ -1,0 +1,160 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.getAllSnippetsWithoutRace = exports.getAllSnippets = void 0;
+const uri_1 = require("../../util/uri");
+const openedFilesLruCache_1 = require("../util/openedFilesLruCache");
+const gitDiffCache_1 = require("./gitDiffCache");
+const types_1 = require("./types");
+const IDE_SNIPPETS_ENABLED = false; // ideSnippets is not used, so it's temporarily disabled
+function racePromise(promise, timeout = 100) {
+    const timeoutPromise = new Promise((resolve) => {
+        setTimeout(() => resolve([]), timeout);
+    });
+    return Promise.race([promise, timeoutPromise]);
+}
+// Some IDEs might have special ways of finding snippets (e.g. JetBrains and VS Code have different "LSP-equivalent" systems,
+// or they might separately track recently edited ranges)
+async function getIdeSnippets(helper, ide, getDefinitionsFromLsp) {
+    const ideSnippets = await getDefinitionsFromLsp(helper.input.filepath, helper.fullPrefix + helper.fullSuffix, helper.fullPrefix.length, ide, helper.lang);
+    if (helper.options.onlyMyCode) {
+        const workspaceDirs = await ide.getWorkspaceDirs();
+        return ideSnippets.filter((snippet) => workspaceDirs.some((dir) => !!(0, uri_1.findUriInDirs)(snippet.filepath, [dir]).foundInDir));
+    }
+    return ideSnippets;
+}
+function getSnippetsFromRecentlyEditedRanges(helper) {
+    if (helper.options.useRecentlyEdited === false) {
+        return [];
+    }
+    return helper.input.recentlyEditedRanges.map((range) => {
+        return {
+            filepath: range.filepath,
+            content: range.lines.join("\n"),
+            type: types_1.AutocompleteSnippetType.Code,
+        };
+    });
+}
+const getClipboardSnippets = async (ide) => {
+    const content = await ide.getClipboardContent();
+    return [content].map((item) => {
+        return {
+            content: item.text,
+            copiedAt: item.copiedAt,
+            type: types_1.AutocompleteSnippetType.Clipboard,
+        };
+    });
+};
+const getDiffSnippets = async (ide) => {
+    const diffs = await (0, gitDiffCache_1.getDiffsFromCache)(ide);
+    return diffs.map((item) => {
+        return {
+            content: item,
+            type: types_1.AutocompleteSnippetType.Diff,
+        };
+    });
+};
+const getSnippetsFromRecentlyOpenedFiles = async (helper, ide) => {
+    if (helper.options.useRecentlyOpened === false) {
+        return [];
+    }
+    try {
+        const currentFileUri = `${helper.filepath}`;
+        // Get all file URIs excluding the current file
+        const fileUrisToRead = [...openedFilesLruCache_1.openedFilesLruCache.entriesDescending()]
+            .filter(([fileUri, _]) => fileUri !== currentFileUri)
+            .map(([fileUri, _]) => fileUri);
+        // Create an array of promises that each read a file with timeout
+        const fileReadPromises = fileUrisToRead.map((fileUri) => {
+            // Create a promise that resolves to a snippet or null
+            const readPromise = new Promise((resolve) => {
+                ide
+                    .readFile(fileUri)
+                    .then((fileContent) => {
+                    if (!fileContent || fileContent.trim() === "") {
+                        resolve(null);
+                        return;
+                    }
+                    resolve({
+                        filepath: fileUri,
+                        content: fileContent,
+                        type: types_1.AutocompleteSnippetType.Code,
+                    });
+                })
+                    .catch((e) => {
+                    console.error(`Failed to read file ${fileUri}:`, e);
+                    resolve(null);
+                });
+            });
+            // Cut off at 80ms via racing promises
+            return Promise.race([
+                readPromise,
+                new Promise((resolve) => setTimeout(() => resolve(null), 80)),
+            ]);
+        });
+        // Execute all file reads in parallel
+        const results = await Promise.all(fileReadPromises);
+        // Filter out null results
+        return results.filter(Boolean);
+    }
+    catch (e) {
+        console.error("Error processing opened files cache:", e);
+        return [];
+    }
+};
+const getAllSnippets = async ({ helper, ide, getDefinitionsFromLsp, contextRetrievalService, }) => {
+    const recentlyEditedRangeSnippets = getSnippetsFromRecentlyEditedRanges(helper);
+    const [rootPathSnippets, importDefinitionSnippets, ideSnippets, diffSnippets, clipboardSnippets, recentlyOpenedFileSnippets, staticSnippet,] = await Promise.all([
+        racePromise(contextRetrievalService.getRootPathSnippets(helper)),
+        racePromise(contextRetrievalService.getSnippetsFromImportDefinitions(helper)),
+        IDE_SNIPPETS_ENABLED
+            ? racePromise(getIdeSnippets(helper, ide, getDefinitionsFromLsp))
+            : [],
+        [], // racePromise(getDiffSnippets(ide)) // temporarily disabled, see https://github.com/continuedev/continue/pull/5882,
+        racePromise(getClipboardSnippets(ide)),
+        racePromise(getSnippetsFromRecentlyOpenedFiles(helper, ide)), // giving this one a little more time to complete
+        helper.options.experimental_enableStaticContextualization
+            ? racePromise(contextRetrievalService.getStaticContextSnippets(helper))
+            : [],
+    ]);
+    return {
+        rootPathSnippets,
+        importDefinitionSnippets,
+        ideSnippets,
+        recentlyEditedRangeSnippets,
+        diffSnippets,
+        clipboardSnippets,
+        recentlyVisitedRangesSnippets: helper.input.recentlyVisitedRanges,
+        recentlyOpenedFileSnippets,
+        staticSnippet,
+    };
+};
+exports.getAllSnippets = getAllSnippets;
+const getAllSnippetsWithoutRace = async ({ helper, ide, getDefinitionsFromLsp, contextRetrievalService, }) => {
+    const recentlyEditedRangeSnippets = getSnippetsFromRecentlyEditedRanges(helper);
+    const [rootPathSnippets, importDefinitionSnippets, ideSnippets, diffSnippets, clipboardSnippets, recentlyOpenedFileSnippets, staticSnippet,] = await Promise.all([
+        contextRetrievalService.getRootPathSnippets(helper),
+        contextRetrievalService.getSnippetsFromImportDefinitions(helper),
+        IDE_SNIPPETS_ENABLED
+            ? getIdeSnippets(helper, ide, getDefinitionsFromLsp)
+            : [],
+        [], // racePromise(getDiffSnippets(ide)) // temporarily disabled, see https://github.com/continuedev/continue/pull/5882,
+        getClipboardSnippets(ide),
+        getSnippetsFromRecentlyOpenedFiles(helper, ide),
+        helper.options.experimental_enableStaticContextualization
+            ? contextRetrievalService.getStaticContextSnippets(helper)
+            : [],
+    ]);
+    return {
+        rootPathSnippets,
+        importDefinitionSnippets,
+        ideSnippets,
+        recentlyEditedRangeSnippets,
+        diffSnippets,
+        clipboardSnippets,
+        recentlyVisitedRangesSnippets: helper.input.recentlyVisitedRanges,
+        recentlyOpenedFileSnippets,
+        staticSnippet,
+    };
+};
+exports.getAllSnippetsWithoutRace = getAllSnippetsWithoutRace;
+//# sourceMappingURL=getAllSnippets.js.map
