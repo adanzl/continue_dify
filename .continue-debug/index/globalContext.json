@@ -7,7 +7,7 @@
   },
   "selectedModelsByProfileId": {
     "local": {
-      "chat": "Llama 3.1 8B",
+      "chat": "Dify Chat Assistant",
       "edit": "Llama 3.1 8B",
       "apply": "Llama 3.1 8B",
       "embed": "Transformers.js (Built-In)",

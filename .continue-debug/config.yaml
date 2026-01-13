@@ -2,6 +2,15 @@ name: Local Config
 version: 1.0.0
 schema: v1
 models:
+  - name: Dify Chat Assistant
+    provider: dify
+    model: chat
+    apiKey: app-Ekx2BvIixSEv6WKR72Htl8Sx
+    apiBase: https://api.dify.ai/v1
+    contextLength: 8000
+    completionOptions:
+      temperature: 0.7
+      maxTokens: 2048
   - name: Llama 3.1 8B
     provider: ollama
     model: llama3.1:8b

@@ -4,7 +4,7 @@
 # 模型配置
 models:
   # Dify Chat 助手
-  - title: Dify Chat Assistant
+  - name: Dify Chat Assistant
     provider: dify
     model: chat
     apiKey: app-Ekx2BvIixSEv6WKR72Htl8Sx
@@ -15,7 +15,7 @@ models:
       maxTokens: 2048
 
   # Dify Workflow
-  - title: Dify Workflow
+  - name: Dify Workflow
     provider: dify
     model: workflow
     apiKey: app-your-workflow-api-key-here
