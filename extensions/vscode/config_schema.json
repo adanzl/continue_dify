@@ -234,7 +234,8 @@
             "ovhcloud",
             "venice",
             "inception",
-            "tars"
+            "tars",
+            "dify"
           ],
           "markdownEnumDescriptions": [
             "### OpenAI\nUse gpt-4, gpt-3.5-turbo, or any other OpenAI model. See [here](https://openai.com/product#made-for-developers) to obtain an API key.\n\n> [Reference](https://docs.continue.dev/reference/Model%20Providers/openai)",
@@ -285,7 +286,8 @@
             "### OVHcloud AI Endpoints is a serverless inference API that provides access to a curated selection of models (e.g., Llama, Mistral, Qwen, Deepseek). It is designed with security and data privacy in mind and is compliant with GDPR. To get started, create an API key on the OVHcloud [AI Endpoints website](https://endpoints.ai.cloud.ovh.net/). For more information, including pricing, visit the OVHcloud [AI Endpoints product page](https://www.ovhcloud.com/en/public-cloud/ai-endpoints/).",
             "### Venice\n Venice.AI is a privacy-focused generative AI platform, allowing users to interact with open-source LLMs without storing any private user data.\nHosted models support the OpenAI API standard, providing seamless integration for users seeking privacy and flexibility.\nTo get started with the Venice API, either purchase a pro account, stake $VVV for daily inference allotments, or fund your account with USD.\nVisit the [API settings page](https://venice.ai/settings/api) or learn more at the [Venice API documentation](https://venice.ai/api).",
             "### Inception\n Inception Labs offer a new generation of diffusion-based LLMs.\nVisit the [API settings page](https://platform.inceptionlabs.ai/) or learn more at the [Inception docs](https://platform.inceptionlabs.ai/docs).",
-            "### TARS\nTARS is an OpenAI-compatible proxy router. To get started, obtain an API key and configure the provider in your config.json."
+            "### TARS\nTARS is an OpenAI-compatible proxy router. To get started, obtain an API key and configure the provider in your config.json.",
+            "### Dify\nDify is an open-source LLM application development platform that supports workflows, knowledge bases, and chat APIs. To get started:\n1. Sign up at [dify.ai](https://dify.ai/) or deploy your own instance\n2. Create an application in Dify\n3. Copy the API key (starts with `app-`)\n4. Set the apiBase to `https://api.dify.ai/v1` (or your self-hosted URL)\n5. Use model `chat` for chat API or `workflow` for workflow API\n> [Reference](https://docs.dify.ai/guides/application-publishing/developing-with-apis)"
           ],
           "type": "string"
         },

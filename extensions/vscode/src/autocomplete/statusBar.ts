@@ -146,7 +146,7 @@ export function setupStatusBar(
 
   statusBarItem.text = statusBarItemText(status, loading, statusBarError);
   statusBarItem.tooltip = statusBarItemTooltip(status ?? statusBarStatus);
-  statusBarItem.command = "continue.openTabAutocompleteConfigMenu";
+  statusBarItem.command = "continue-dify.openTabAutocompleteConfigMenu";
 
   statusBarItem.show();
   if (status !== undefined) {
@@ -232,7 +232,7 @@ export function getNextEditMenuItems(
   currentStatus: StatusBarStatus | undefined,
   nextEditEnabled: boolean,
 ): vscode.QuickPickItem[] {
-  if (currentStatus !== StatusBarStatus.Enabled) return [];
+  if (currentStatus !== StatusBarStatus.Enabled) {return [];}
 
   return [
     {

@@ -10,10 +10,14 @@ const esbuildConfig = {
   entryPoints: ["src/extension.ts"],
   bundle: true,
   outfile: "out/extension.js",
-  external: ["vscode", "esbuild", "./xhr-sync-worker.js"],
+  external: ["vscode", "esbuild", "sqlite3", "./xhr-sync-worker.js"],
   format: "cjs",
   platform: "node",
   sourcemap: flags.includes("--sourcemap"),
+  nodePaths: [
+    "./node_modules",
+    "../../core/node_modules"
+  ],
   loader: {
     // eslint-disable-next-line @typescript-eslint/naming-convention
     ".node": "file",
@@ -35,10 +39,42 @@ const esbuildConfig = {
             throw new Error(result.errors);
           } else {
             try {
+              // Ensure build directory exists
+              if (!fs.existsSync("./build")) {
+                fs.mkdirSync("./build", { recursive: true });
+              }
               fs.writeFileSync(
                 "./build/meta.json",
                 JSON.stringify(result.metafile, null, 2),
               );
+              
+              // Copy xhr-sync-worker.js for jsdom
+              const xhrWorkerSrc = "../../core/node_modules/jsdom/lib/jsdom/living/xhr/xhr-sync-worker.js";
+              const xhrWorkerDest = "./out/xhr-sync-worker.js";
+              if (fs.existsSync(xhrWorkerSrc)) {
+                fs.copyFileSync(xhrWorkerSrc, xhrWorkerDest);
+              }
+              
+              // Copy tree-sitter.wasm
+              const treeSitterSrc = "../../core/vendor/tree-sitter.wasm";
+              const treeSitterDest = "./out/tree-sitter.wasm";
+              if (fs.existsSync(treeSitterSrc)) {
+                fs.copyFileSync(treeSitterSrc, treeSitterDest);
+              }
+              
+              // Copy .mjs worker files
+              const mjsFiles = [
+                "llamaTokenizerWorkerPool.mjs",
+                "llamaTokenizer.mjs", 
+                "tiktokenWorkerPool.mjs"
+              ];
+              mjsFiles.forEach(file => {
+                const src = `../../core/llm/${file}`;
+                const dest = `./out/${file}`;
+                if (fs.existsSync(src)) {
+                  fs.copyFileSync(src, dest);
+                }
+              });
             } catch (e) {
               console.error("Failed to write esbuild meta file", e);
             }

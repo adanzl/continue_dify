@@ -5,6 +5,10 @@ import { IContextProvider } from "core";
 import { ConfigHandler } from "core/config/ConfigHandler";
 import { EXTENSION_NAME, getControlPlaneEnv } from "core/control-plane/env";
 import { Core } from "core/core";
+import { modelSupportsNextEdit } from "core/llm/autodetect";
+import { NEXT_EDIT_MODELS } from "core/llm/constants";
+import { NextEditProvider } from "core/nextEdit/NextEditProvider";
+import { isNextEditTest } from "core/nextEdit/utils";
 import { FromCoreProtocol, ToCoreProtocol } from "core/protocol";
 import { InProcessMessenger } from "core/protocol/messenger";
 import {
@@ -16,7 +20,17 @@ import {
 import { v4 as uuidv4 } from "uuid";
 import * as vscode from "vscode";
 
+import { JumpManager } from "../activation/JumpManager";
+import setupNextEditWindowManager, {
+  NextEditWindowManager,
+} from "../activation/NextEditWindowManager";
+import {
+  HandlerPriority,
+  SelectionChangeManager,
+} from "../activation/SelectionChangeManager";
 import { ContinueCompletionProvider } from "../autocomplete/completionProvider";
+import { GhostTextAcceptanceTracker } from "../autocomplete/GhostTextAcceptanceTracker";
+import { getDefinitionsFromLsp } from "../autocomplete/lsp";
 import {
   monitorBatteryChanges,
   setupStatusBar,
@@ -37,6 +51,11 @@ import {
   WorkOsAuthProvider,
 } from "../stubs/WorkOsAuthProvider";
 import { Battery } from "../util/battery";
+import {
+  clearDocumentContentCache,
+  handleTextDocumentChange,
+  initDocumentContentCache,
+} from "../util/editLoggingUtils";
 import { FileSearch } from "../util/FileSearch";
 import { VsCodeIdeUtils } from "../util/ideUtils";
 import { VsCodeIde } from "../VsCodeIde";
@@ -44,25 +63,6 @@ import { VsCodeIde } from "../VsCodeIde";
 import { ConfigYamlDocumentLinkProvider } from "./ConfigYamlDocumentLinkProvider";
 import { VsCodeMessenger } from "./VsCodeMessenger";
 
-import { modelSupportsNextEdit } from "core/llm/autodetect";
-import { NEXT_EDIT_MODELS } from "core/llm/constants";
-import { NextEditProvider } from "core/nextEdit/NextEditProvider";
-import { isNextEditTest } from "core/nextEdit/utils";
-import { JumpManager } from "../activation/JumpManager";
-import setupNextEditWindowManager, {
-  NextEditWindowManager,
-} from "../activation/NextEditWindowManager";
-import {
-  HandlerPriority,
-  SelectionChangeManager,
-} from "../activation/SelectionChangeManager";
-import { GhostTextAcceptanceTracker } from "../autocomplete/GhostTextAcceptanceTracker";
-import { getDefinitionsFromLsp } from "../autocomplete/lsp";
-import {
-  clearDocumentContentCache,
-  handleTextDocumentChange,
-  initDocumentContentCache,
-} from "../util/editLoggingUtils";
 import type { VsCodeWebviewProtocol } from "../webviewProtocol";
 
 export class VsCodeExtension {
@@ -80,6 +80,7 @@ export class VsCodeExtension {
   webviewProtocolPromise: Promise<VsCodeWebviewProtocol>;
   private core: Core;
   private battery: Battery;
+  private outputChannel: vscode.OutputChannel;
   private workOsAuthProvider: WorkOsAuthProvider;
   private fileSearch: FileSearch;
   private uriHandler = new UriEventHandler();
@@ -127,7 +128,7 @@ export class VsCodeExtension {
       !isNextEditTest() &&
       process.env.CONTINUE_E2E_NON_NEXT_EDIT_TEST === "true"
     ) {
-      vscode.window
+      void vscode.window
         .showWarningMessage(
           `The current autocomplete model (${autocompleteModel?.title || "unknown"}) does not support Next Edit.`,
           "Disable Next Edit",
@@ -135,14 +136,14 @@ export class VsCodeExtension {
         )
         .then((selection) => {
           if (selection === "Disable Next Edit") {
-            vscodeConfig.update(
+            void vscodeConfig.update(
               "enableNextEdit",
               false,
               vscode.ConfigurationTarget.Global,
             );
           } else if (selection === "Select different model") {
-            vscode.commands.executeCommand(
-              "continue.openTabAutocompleteConfigMenu",
+            void vscode.commands.executeCommand(
+              "continue-dify.openTabAutocompleteConfigMenu",
             );
           }
         });
@@ -175,8 +176,11 @@ export class VsCodeExtension {
     }
   }
 
-  constructor(context: vscode.ExtensionContext) {
+  constructor(context: vscode.ExtensionContext, outputChannel: vscode.OutputChannel) {
+    this.outputChannel = outputChannel;
+    
     // Register auth provider
+    outputChannel.appendLine("Registering auth provider...");
     this.workOsAuthProvider = new WorkOsAuthProvider(context, this.uriHandler);
 
     void this.workOsAuthProvider.refreshSessions();
@@ -265,7 +269,7 @@ export class VsCodeExtension {
     // Sidebar
     context.subscriptions.push(
       vscode.window.registerWebviewViewProvider(
-        "continue.continueGUIView",
+        "continue-dify.continueDifyGUIView",
         this.sidebar,
         {
           webviewOptions: { retainContextWhenHidden: true },
@@ -291,10 +295,12 @@ export class VsCodeExtension {
       this,
     );
 
+    this.outputChannel.appendLine("Initializing core...");
     this.core = new Core(inProcessMessenger, this.ide);
     this.configHandler = this.core.configHandler;
     resolveConfigHandler?.(this.configHandler);
 
+    this.outputChannel.appendLine("Loading configuration...");
     void this.configHandler.loadConfig();
 
     this.verticalDiffManager = new VerticalDiffManager(
@@ -304,11 +310,9 @@ export class VsCodeExtension {
     );
     resolveVerticalDiffManager?.(this.verticalDiffManager);
 
-    void setupRemoteConfigSync(() =>
-      this.configHandler.reloadConfig.bind(this.configHandler)(
-        "Remote config sync",
-      ),
-    );
+    void setupRemoteConfigSync(() => {
+      void this.configHandler.reloadConfig("Remote config sync");
+    });
 
     void this.configHandler.loadConfig().then(async ({ config }) => {
       const shouldUseFullFileDiff = await getUsingFullFileDiff();
@@ -325,8 +329,9 @@ export class VsCodeExtension {
         verticalDiffCodeLens.refresh.bind(verticalDiffCodeLens);
     });
 
-    this.configHandler.onConfigUpdate(
-      async ({ config: newConfig, configLoadInterrupted }) => {
+    void this.configHandler.onConfigUpdate(
+      ({ config: newConfig, configLoadInterrupted }) => {
+        void (async () => {
         const shouldUseFullFileDiff = await getUsingFullFileDiff();
         this.completionProvider.updateUsingFullFileDiff(shouldUseFullFileDiff);
         selectionManager.updateUsingFullFileDiff(shouldUseFullFileDiff);
@@ -345,6 +350,7 @@ export class VsCodeExtension {
             newConfig,
           );
         }
+        })();
       },
     );
 
@@ -414,7 +420,7 @@ export class VsCodeExtension {
 
     context.subscriptions.push(
       vscode.window.registerWebviewViewProvider(
-        "continue.continueConsoleView",
+        "continue-dify.continueDifyConsoleView",
         this.consoleView,
       ),
     );
@@ -439,25 +445,29 @@ export class VsCodeExtension {
 
     // Listen for file saving - use global file watcher so that changes
     // from outside the window are also caught
-    fs.watchFile(getConfigJsonPath(), { interval: 1000 }, async (stats) => {
-      if (stats.size === 0) {
-        return;
-      }
-      await this.configHandler.reloadConfig(
-        "Global JSON config updated - fs file watch",
-      );
+    fs.watchFile(getConfigJsonPath(), { interval: 1000 }, (stats) => {
+      void (async () => {
+        if (stats.size === 0) {
+          return;
+        }
+        await this.configHandler.reloadConfig(
+          "Global JSON config updated - fs file watch",
+        );
+      })();
     });
 
     fs.watchFile(
       getConfigYamlPath("vscode"),
       { interval: 1000 },
-      async (stats) => {
-        if (stats.size === 0) {
-          return;
-        }
-        await this.configHandler.reloadConfig(
-          "Global YAML config updated - fs file watch",
-        );
+      (stats) => {
+        void (async () => {
+          if (stats.size === 0) {
+            return;
+          }
+          await this.configHandler.reloadConfig(
+            "Global YAML config updated - fs file watch",
+          );
+        })();
       },
     );
 
@@ -503,7 +513,9 @@ export class VsCodeExtension {
         getDefinitionsFromLsp,
       );
 
-      if (editInfo) this.core.invoke("files/smallEdit", editInfo);
+      if (editInfo) {
+        void this.core.invoke("files/smallEdit", editInfo);
+      }
     });
 
     vscode.workspace.onDidSaveTextDocument(async (event) => {
@@ -562,25 +574,25 @@ export class VsCodeExtension {
     vscode.authentication.onDidChangeSessions(async (e) => {
       const env = await getControlPlaneEnv(this.ide.getIdeSettings());
       if (e.provider.id === env.AUTH_TYPE) {
-        void vscode.commands.executeCommand(
-          "setContext",
-          "continue.isSignedInToControlPlane",
-          true,
-        );
+          void vscode.commands.executeCommand(
+            "setContext",
+            "continue-dify.isSignedInToControlPlane",
+            true,
+          );
 
         const sessionInfo = await getControlPlaneSessionInfo(true, false);
         void this.core.invoke("didChangeControlPlaneSessionInfo", {
           sessionInfo,
         });
-      } else {
-        void vscode.commands.executeCommand(
-          "setContext",
-          "continue.isSignedInToControlPlane",
-          false,
-        );
+        } else {
+          void vscode.commands.executeCommand(
+            "setContext",
+            "continue-dify.isSignedInToControlPlane",
+            false,
+          );
 
         if (e.provider.id === "github") {
-          this.configHandler.reloadConfig("Github sign-in status changed");
+          void this.configHandler.reloadConfig("Github sign-in status changed");
         }
       }
     });
@@ -598,11 +610,12 @@ export class VsCodeExtension {
     });
 
     // Refresh index when branch is changed
-    void this.ide.getWorkspaceDirs().then((dirs) =>
-      dirs.forEach(async (dir) => {
-        const repo = await this.ide.getRepo(dir);
-        if (repo) {
-          repo.state.onDidChange(() => {
+    void this.ide.getWorkspaceDirs().then((dirs) => {
+      dirs.forEach((dir) => {
+        void (async () => {
+          const repo = await this.ide.getRepo(dir);
+          if (repo) {
+            repo.state.onDidChange(() => {
             // args passed to this callback are always undefined, so keep track of previous branch
             const currentBranch = repo?.state?.HEAD?.name;
             if (currentBranch) {
@@ -611,7 +624,7 @@ export class VsCodeExtension {
                   currentBranch !== this.PREVIOUS_BRANCH_FOR_WORKSPACE_DIR[dir]
                 ) {
                   // Trigger refresh of index only in this directory
-                  this.core.invoke("index/forceReIndex", { dirs: [dir] });
+                  void this.core.invoke("index/forceReIndex", { dirs: [dir] });
                 }
               }
 
@@ -619,8 +632,9 @@ export class VsCodeExtension {
             }
           });
         }
-      }),
-    );
+        })();
+      });
+    });
 
     // Register a content provider for the readonly virtual documents
     const documentContentProvider = new (class

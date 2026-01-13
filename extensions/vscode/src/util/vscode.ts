@@ -22,7 +22,7 @@ export function getNonce() {
 }
 
 export function getExtensionUri(): vscode.Uri {
-  return vscode.extensions.getExtension("Continue.continue")!.extensionUri;
+  return vscode.extensions.getExtension("ContinueDify.continue-dify")!.extensionUri;
 }
 
 export function getViewColumnOfFile(
@@ -76,7 +76,7 @@ export function openEditorAndRevealRange(
   preview?: boolean,
 ): Promise<vscode.TextEditor> {
   return new Promise((resolve, _) => {
-    vscode.workspace.openTextDocument(uri).then(async (doc) => {
+    void vscode.workspace.openTextDocument(uri).then(async (doc) => {
       try {
         // An error is thrown mysteriously if you open two documents in parallel, hence this
         while (showTextDocumentInProcess) {
@@ -87,7 +87,7 @@ export function openEditorAndRevealRange(
           });
         }
         showTextDocumentInProcess = true;
-        vscode.window
+        void vscode.window
           .showTextDocument(doc, {
             viewColumn: getViewColumnOfFile(uri) || viewColumn,
             preview,

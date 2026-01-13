@@ -25,7 +25,7 @@ export class Battery implements Disposable {
     const stats = await this.batteryStatsPromise;
     const level = stats.hasBattery ? stats.percent : 100;
     const isACConnected =
-      !stats.hasBattery || stats.acConnected || level == 100;
+      !stats.hasBattery || stats.acConnected || level === 100;
 
     if (isACConnected !== this.acConnected) {
       this.acConnected = isACConnected;

@@ -154,7 +154,7 @@ class VsCodeIde implements IDE {
       case "error":
         return showErrorMessage(message, "Show logs").then((selection) => {
           if (selection === "Show logs") {
-            vscode.commands.executeCommand("workbench.action.toggleDevTools");
+            void vscode.commands.executeCommand("workbench.action.toggleDevTools");
           }
         });
       case "info":
@@ -318,7 +318,7 @@ class VsCodeIde implements IDE {
       new vscode.Position(startLine, 0),
       new vscode.Position(endLine, 0),
     );
-    openEditorAndRevealRange(vscode.Uri.parse(fileUri), range).then(
+    void openEditorAndRevealRange(vscode.Uri.parse(fileUri), range).then(
       (editor) => {
         // Select the lines
         editor.selection = new vscode.Selection(

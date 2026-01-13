@@ -1,1 +1,0 @@
-{"version":3,"file":"PolicySingleton.js","sourceRoot":"","sources":["PolicySingleton.ts"],"names":[],"mappings":";;;AAEA,MAAa,eAAe;IAI1B;QAFO,WAAM,GAA0B,IAAI,CAAC;IAErB,CAAC;IAEjB,MAAM,CAAC,WAAW;QACvB,IAAI,CAAC,eAAe,CAAC,QAAQ,EAAE,CAAC;YAC9B,eAAe,CAAC,QAAQ,GAAG,IAAI,eAAe,EAAE,CAAC;QACnD,CAAC;QACD,OAAO,eAAe,CAAC,QAAQ,CAAC;IAClC,CAAC;CACF;AAZD,0CAYC"}

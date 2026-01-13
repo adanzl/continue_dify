@@ -55,8 +55,8 @@ export async function addCurrentSelectionToEdit({
   const range =
     args?.range ?? new vscode.Range(startFromCharZero, endAtCharLast);
 
-  editDecorationManager.clear();
-  editDecorationManager.addDecorations(editor, [range]);
+  void editDecorationManager.clear();
+  void editDecorationManager.addDecorations(editor, [range]);
 
   const rangeInFileWithContents = getRangeInFileWithContents(true, range);
 

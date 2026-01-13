@@ -193,120 +193,229 @@ function sleep(ms: number): Promise<void> {
 export function withRetry(options: RetryOptions = {}) {
   const config = { ...DEFAULT_RETRY_OPTIONS, ...options };
 
-  return function (...args: any[]): any {
-    // Handle different decorator calling patterns
-    const [target, propertyName, descriptor] = args;
+  return function (originalMethod: any, context: any): any {
+    // Support both old and new decorator syntax
+    // New syntax (Stage 3): (originalMethod, context)
+    // Old syntax: (target, propertyName, descriptor)
+    
+    // Check if this is the new decorator syntax
+    if (context && typeof context === 'object' && 'kind' in context) {
+      // New decorator API (Stage 3)
+      const kind = context.kind;
+      
+      if (kind !== 'method') {
+        throw new Error(`@withRetry can only be applied to methods, but was applied to ${kind}`);
+      }
 
-    // Get the original method
-    let originalMethod: Function;
-    if (descriptor && descriptor.value) {
-      originalMethod = descriptor.value;
-    } else {
-      // Get method from prototype
-      originalMethod = target[propertyName];
-    }
+      if (!originalMethod || typeof originalMethod !== 'function') {
+        throw new Error(`@withRetry can only be applied to methods`);
+      }
 
-    if (!originalMethod || typeof originalMethod !== "function") {
-      throw new Error(`@withRetry can only be applied to methods`);
-    }
+      // Check if the original method is an async generator function
+      const isAsyncGenerator =
+        originalMethod.constructor.name === "AsyncGeneratorFunction";
 
-    // Check if the original method is an async generator function
-    const isAsyncGenerator =
-      originalMethod.constructor.name === "AsyncGeneratorFunction";
+      const wrappedMethod = isAsyncGenerator
+        ? async function* (this: any, ...methodArgs: any[]) {
+            let lastError: any;
 
-    const wrappedMethod = isAsyncGenerator
-      ? async function* (this: any, ...methodArgs: any[]) {
-          let lastError: any;
+            for (let attempt = 1; attempt <= config.maxAttempts; attempt++) {
+              try {
+                const generator = originalMethod.apply(this, methodArgs);
+                yield* createRetryableAsyncGenerator(
+                  generator,
+                  config,
+                  originalMethod,
+                  this,
+                  methodArgs,
+                  attempt,
+                );
+                return; // Successfully completed
+              } catch (error) {
+                lastError = error;
 
-          for (let attempt = 1; attempt <= config.maxAttempts; attempt++) {
-            try {
-              const generator = originalMethod.apply(this, methodArgs);
-              yield* createRetryableAsyncGenerator(
-                generator,
-                config,
-                originalMethod,
-                this,
-                methodArgs,
-                attempt,
-              );
-              return; // Successfully completed
-            } catch (error) {
-              lastError = error;
+                // Check if we should retry this error
+                if (!config.shouldRetry(error, attempt)) {
+                  throw error;
+                }
 
-              // Check if we should retry this error
-              if (!config.shouldRetry(error, attempt)) {
-                throw error;
+                // Don't delay on the last attempt
+                if (attempt === config.maxAttempts) {
+                  break;
+                }
+
+                // Calculate delay and wait
+                const delay = calculateDelay(
+                  attempt,
+                  config.baseDelay,
+                  config.maxDelay,
+                  config.jitterFactor,
+                  error,
+                );
+
+                config.onRetry(error, attempt, delay);
+                await sleep(delay);
               }
-
-              // Don't delay on the last attempt
-              if (attempt === config.maxAttempts) {
-                break;
-              }
-
-              // Calculate delay and wait
-              const delay = calculateDelay(
-                attempt,
-                config.baseDelay,
-                config.maxDelay,
-                config.jitterFactor,
-                error,
-              );
-
-              config.onRetry(error, attempt, delay);
-              await sleep(delay);
             }
+
+            // If we get here, all attempts failed
+            throw lastError;
           }
+        : async function (this: any, ...methodArgs: any[]) {
+            let lastError: any;
 
-          // If we get here, all attempts failed
-          throw lastError;
-        }
-      : async function (this: any, ...methodArgs: any[]) {
-          let lastError: any;
+            for (let attempt = 1; attempt <= config.maxAttempts; attempt++) {
+              try {
+                const result = originalMethod.apply(this, methodArgs);
+                return await result;
+              } catch (error) {
+                lastError = error;
 
-          for (let attempt = 1; attempt <= config.maxAttempts; attempt++) {
-            try {
-              const result = originalMethod.apply(this, methodArgs);
-              return await result;
-            } catch (error) {
-              lastError = error;
+                // Check if we should retry this error
+                if (!config.shouldRetry(error, attempt)) {
+                  throw error;
+                }
 
-              // Check if we should retry this error
-              if (!config.shouldRetry(error, attempt)) {
-                throw error;
+                // Don't delay on the last attempt
+                if (attempt === config.maxAttempts) {
+                  break;
+                }
+
+                // Calculate delay and wait
+                const delay = calculateDelay(
+                  attempt,
+                  config.baseDelay,
+                  config.maxDelay,
+                  config.jitterFactor,
+                  error,
+                );
+
+                config.onRetry(error, attempt, delay);
+
+                await sleep(delay);
               }
-
-              // Don't delay on the last attempt
-              if (attempt === config.maxAttempts) {
-                break;
-              }
-
-              // Calculate delay and wait
-              const delay = calculateDelay(
-                attempt,
-                config.baseDelay,
-                config.maxDelay,
-                config.jitterFactor,
-                error,
-              );
-
-              config.onRetry(error, attempt, delay);
-
-              await sleep(delay);
             }
-          }
 
-          // If we get here, all attempts failed
-          throw lastError;
-        };
+            // If we get here, all attempts failed
+            throw lastError;
+          };
 
-    // Apply the wrapped method based on how the decorator was called
-    if (descriptor) {
-      descriptor.value = wrappedMethod;
-      return descriptor;
-    } else {
-      // Handle case where descriptor is not provided
-      target[propertyName] = wrappedMethod;
       return wrappedMethod;
+    } else {
+      // Old decorator API - for backwards compatibility
+      const [target, propertyName, descriptor] = [originalMethod, context, arguments[2]];
+
+      // Get the original method
+      let method: Function;
+      if (descriptor && descriptor.value) {
+        method = descriptor.value;
+      } else {
+        // Get method from prototype
+        method = target[propertyName];
+      }
+
+      if (!method || typeof method !== "function") {
+        throw new Error(`@withRetry can only be applied to methods`);
+      }
+
+      // Check if the original method is an async generator function
+      const isAsyncGenerator =
+        method.constructor.name === "AsyncGeneratorFunction";
+
+      const wrappedMethod = isAsyncGenerator
+        ? async function* (this: any, ...methodArgs: any[]) {
+            let lastError: any;
+
+            for (let attempt = 1; attempt <= config.maxAttempts; attempt++) {
+              try {
+                const generator = method.apply(this, methodArgs);
+                yield* createRetryableAsyncGenerator(
+                  generator,
+                  config,
+                  method,
+                  this,
+                  methodArgs,
+                  attempt,
+                );
+                return; // Successfully completed
+              } catch (error) {
+                lastError = error;
+
+                // Check if we should retry this error
+                if (!config.shouldRetry(error, attempt)) {
+                  throw error;
+                }
+
+                // Don't delay on the last attempt
+                if (attempt === config.maxAttempts) {
+                  break;
+                }
+
+                // Calculate delay and wait
+                const delay = calculateDelay(
+                  attempt,
+                  config.baseDelay,
+                  config.maxDelay,
+                  config.jitterFactor,
+                  error,
+                );
+
+                config.onRetry(error, attempt, delay);
+                await sleep(delay);
+              }
+            }
+
+            // If we get here, all attempts failed
+            throw lastError;
+          }
+        : async function (this: any, ...methodArgs: any[]) {
+            let lastError: any;
+
+            for (let attempt = 1; attempt <= config.maxAttempts; attempt++) {
+              try {
+                const result = method.apply(this, methodArgs);
+                return await result;
+              } catch (error) {
+                lastError = error;
+
+                // Check if we should retry this error
+                if (!config.shouldRetry(error, attempt)) {
+                  throw error;
+                }
+
+                // Don't delay on the last attempt
+                if (attempt === config.maxAttempts) {
+                  break;
+                }
+
+                // Calculate delay and wait
+                const delay = calculateDelay(
+                  attempt,
+                  config.baseDelay,
+                  config.maxDelay,
+                  config.jitterFactor,
+                  error,
+                );
+
+                config.onRetry(error, attempt, delay);
+
+                await sleep(delay);
+              }
+            }
+
+            // If we get here, all attempts failed
+            throw lastError;
+          };
+
+      // Apply the wrapped method based on how the decorator was called
+      if (descriptor) {
+        descriptor.value = wrappedMethod;
+        return descriptor;
+      } else {
+        // Handle case where descriptor is not provided
+        target[propertyName] = wrappedMethod;
+        return wrappedMethod;
+      }
     }
   };
 }

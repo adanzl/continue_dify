@@ -1,0 +1,41 @@
+{
+  "models": [
+    {
+      "title": "Dify Chat Assistant",
+      "provider": "dify",
+      "model": "chat",
+      "apiKey": "app-your-dify-api-key-here",
+      "apiBase": "https://api.dify.ai/v1",
+      "contextLength": 8000,
+      "completionOptions": {
+        "temperature": 0.7,
+        "maxTokens": 2048
+      }
+    },
+    {
+      "title": "Dify Workflow",
+      "provider": "dify",
+      "model": "workflow",
+      "apiKey": "app-your-workflow-api-key-here",
+      "apiBase": "https://api.dify.ai/v1",
+      "contextLength": 8000,
+      "completionOptions": {
+        "temperature": 0.7,
+        "maxTokens": 2048
+      }
+    }
+  ],
+  "selectedModelByRole": {
+    "chat": "Dify Chat Assistant",
+    "edit": "Dify Chat Assistant"
+  },
+  "tabAutocompleteModel": {
+    "title": "Dify Autocomplete",
+    "provider": "dify",
+    "model": "chat",
+    "apiKey": "app-your-dify-api-key-here",
+    "apiBase": "https://api.dify.ai/v1"
+  },
+  "allowAnonymousTelemetry": false,
+  "systemMessage": "你是一个专业的编程助手，精通多种编程语言和框架。"
+}

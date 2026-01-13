@@ -17,9 +17,9 @@ class EditDecorationManager {
   }
 
   private updateInEditMode(inEditMode: boolean) {
-    vscode.commands.executeCommand(
+    void vscode.commands.executeCommand(
       "setContext",
-      "continue.inEditMode",
+      "continue-dify.inEditMode",
       inEditMode,
     );
   }

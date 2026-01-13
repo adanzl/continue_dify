@@ -1,15 +1,17 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { EXTENSION_NAME } from "core/control-plane/env";
 // @ts-ignore
-import * as vscode from "vscode";
 
 import { DiffChar, DiffLine } from "core";
 import { CodeRenderer } from "core/codeRenderer/CodeRenderer";
+import { EXTENSION_NAME } from "core/control-plane/env";
 import { myersCharDiff } from "core/diff/myers";
 import { getOffsetPositionAtLastNewLine } from "core/nextEdit/diff/diff";
 import { NextEditLoggingService } from "core/nextEdit/NextEditLoggingService";
 import { NextEditProvider } from "core/nextEdit/NextEditProvider";
+import * as vscode from "vscode";
+
 import { getThemeString } from "../util/getTheme";
+
 import {
   HandlerPriority,
   SelectionChangeManager,
@@ -94,9 +96,9 @@ const SVG_CONFIG = {
 
 // Command ID - can be used in package.json
 export const HIDE_NEXT_EDIT_SUGGESTION_COMMAND =
-  "continue.nextEditWindow.hideNextEditSuggestion";
+  "continue-dify.nextEditWindow.hideNextEditSuggestion";
 export const ACCEPT_NEXT_EDIT_SUGGESTION_COMMAND =
-  "continue.nextEditWindow.acceptNextEditSuggestion";
+  "continue-dify.nextEditWindow.acceptNextEditSuggestion";
 
 /**
  * This is where we create SVG windows and deletion decorations for non-FIM next edit suggestions.
@@ -305,8 +307,8 @@ export class NextEditWindowManager {
    */
   private registerCommandSafely(
     commandId:
-      | "continue.nextEditWindow.hideNextEditSuggestion"
-      | "continue.nextEditWindow.acceptNextEditSuggestion",
+      | "continue-dify.nextEditWindow.hideNextEditSuggestion"
+      | "continue-dify.nextEditWindow.acceptNextEditSuggestion",
     callback: () => Promise<void>,
   ) {
     if (!this.context) {
@@ -491,7 +493,7 @@ export class NextEditWindowManager {
 
     // Log with accept = false.
     await vscode.commands.executeCommand(
-      "continue.logNextEditOutcomeReject",
+      "continue-dify.logNextEditOutcomeReject",
       this.mostRecentCompletionId,
       this.loggingService,
     );
@@ -568,7 +570,7 @@ export class NextEditWindowManager {
 
     // Log with accept = true.
     await vscode.commands.executeCommand(
-      "continue.logNextEditOutcomeAccept",
+      "continue-dify.logNextEditOutcomeAccept",
       this.mostRecentCompletionId,
       this.loggingService,
     );
@@ -922,9 +924,9 @@ export class NextEditWindowManager {
 
     // Clear the timeout while SVG is on the editor.
     if (this.currentDecoration && this.mostRecentCompletionId)
-      this.loggingService.cancelRejectionTimeoutButKeepCompletionId(
+      {this.loggingService.cancelRejectionTimeoutButKeepCompletionId(
         this.mostRecentCompletionId,
-      );
+      );}
   }
 
   private renderDeletions(editor: vscode.TextEditor, oldDiffChars: DiffChar[]) {

@@ -76,7 +76,7 @@ export class RemoteConfigSync {
       return;
     }
     if (!canParseUrl(this.remoteConfigServerUrl)) {
-      vscode.window.showErrorMessage(
+      void vscode.window.showErrorMessage(
         "The value set for 'remoteConfigServerUrl' is not valid: ",
         this.remoteConfigServerUrl,
       );
@@ -120,7 +120,7 @@ export class RemoteConfigSync {
       );
       this.triggerReloadConfig();
     } catch (e) {
-      vscode.window.showWarningMessage(`Failed to sync remote config: ${e}`);
+      void vscode.window.showWarningMessage(`Failed to sync remote config: ${e}`);
     }
   }
 }

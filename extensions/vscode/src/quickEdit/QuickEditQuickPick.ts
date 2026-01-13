@@ -201,14 +201,14 @@ export class QuickEdit {
       const { label } = quickPick.selectedItems[0];
       switch (label) {
         case UserPromptLabels.AcceptAll:
-          vscode.commands.executeCommand("continue.acceptDiff", path);
+          void vscode.commands.executeCommand("continue-dify.acceptDiff", path);
           break;
         case UserPromptLabels.RejectAll:
-          vscode.commands.executeCommand("continue.rejectDiff", path);
+          void vscode.commands.executeCommand("continue-dify.rejectDiff", path);
           break;
         case QuickEditInitialItemLabels.Submit:
           if (quickPick.value) {
-            await vscode.commands.executeCommand("continue.rejectDiff", path);
+            await vscode.commands.executeCommand("continue-dify.rejectDiff", path);
             const newPrompt = quickPick.value;
             appendToHistory(newPrompt, this.context);
             this.handleUserPrompt(newPrompt, path);
@@ -356,7 +356,7 @@ export class QuickEdit {
     const model = await this.getCurModel();
 
     if (!model) {
-      this.ide.showToast("error", "Please configure a model to use Quick Edit");
+      void this.ide.showToast("error", "Please configure a model to use Quick Edit");
       return { label: undefined, value: undefined };
     }
 

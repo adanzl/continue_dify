@@ -3,7 +3,9 @@ import { NextEditOutcome } from "core/nextEdit/types";
 // @ts-ignore
 import svgBuilder from "svg-builder";
 import * as vscode from "vscode";
+
 import { getTheme } from "../util/getTheme";
+
 import {
   HandlerPriority,
   SelectionChangeManager,
@@ -119,7 +121,7 @@ export class JumpManager {
   public dispose() {
     // Dispose current decoration.
     this._disposables.forEach((d) => {
-      if (d) d.dispose();
+      if (d) {d.dispose();}
     });
     this._disposables = [];
   }
@@ -318,7 +320,7 @@ export class JumpManager {
     // Set the context key to enable tab/esc shortcuts.
     await vscode.commands.executeCommand(
       "setContext",
-      "continue.jumpDecorationVisible",
+      "continue-dify.jumpDecorationVisible",
       true,
     );
     this._jumpDecorationVisible = true;
@@ -339,7 +341,7 @@ export class JumpManager {
     // Reset the context.
     await vscode.commands.executeCommand(
       "setContext",
-      "continue.jumpDecorationVisible",
+      "continue-dify.jumpDecorationVisible",
       false,
     );
     this._jumpDecorationVisible = false;
@@ -350,7 +352,7 @@ export class JumpManager {
     jumpPosition: vscode.Position,
   ) {
     const acceptJumpCommand = vscode.commands.registerCommand(
-      "continue.acceptJump",
+      "continue-dify.acceptJump",
       async () => {
         if (this._jumpDecorationVisible) {
           this._jumpAccepted = true;
@@ -366,19 +368,19 @@ export class JumpManager {
           await this.clearJumpDecoration();
 
           this._jumpAccepted = false;
-          vscode.commands.executeCommand("editor.action.inlineSuggest.trigger");
+          void vscode.commands.executeCommand("editor.action.inlineSuggest.trigger");
         }
       },
     );
 
     const rejectJumpCommand = vscode.commands.registerCommand(
-      "continue.rejectJump",
+      "continue-dify.rejectJump",
       async () => {
         if (this._jumpDecorationVisible) {
           console.debug(
             "deleteChain from JumpManager.ts: rejectJump and decoration visible",
           );
-          NextEditProvider.getInstance().deleteChain();
+          void NextEditProvider.getInstance().deleteChain();
           await this.clearJumpDecoration();
         }
       },
@@ -404,7 +406,7 @@ export class JumpManager {
           this._oldCursorPosition &&
           !currentPosition.isEqual(this._oldCursorPosition)
         ) {
-          vscode.commands.executeCommand("continue.rejectJump");
+          void vscode.commands.executeCommand("continue-dify.rejectJump");
         }
       });
 

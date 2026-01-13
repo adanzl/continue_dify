@@ -1,21 +1,23 @@
 import { ChatMessage, DiffLine, IDE, ILLM, RuleWithSource } from "core";
+import { myersDiff } from "core/diff/myers";
+import { ApplyAbortManager } from "core/edit/applyAbortManager";
+import { EDIT_MODE_STREAM_ID } from "core/edit/constants";
 import { streamDiffLines } from "core/edit/streamDiffLines";
 import { pruneLinesFromBottom, pruneLinesFromTop } from "core/llm/countTokens";
 import { getMarkdownLanguageTagForFile } from "core/util";
+import { stripImages } from "core/util/messageContent";
+import { getLastNPathParts } from "core/util/uri";
 import * as URI from "uri-js";
 import * as vscode from "vscode";
 
 import { isFastApplyModel } from "../../apply/utils";
+import { editOutcomeTracker } from "../../extension/EditOutcomeTracker";
 import EditDecorationManager from "../../quickEdit/EditDecorationManager";
 import { handleLLMError } from "../../util/errorHandling";
 import { VsCodeWebviewProtocol } from "../../webviewProtocol";
 
-import { myersDiff } from "core/diff/myers";
-import { ApplyAbortManager } from "core/edit/applyAbortManager";
-import { EDIT_MODE_STREAM_ID } from "core/edit/constants";
-import { stripImages } from "core/util/messageContent";
-import { getLastNPathParts } from "core/util/uri";
-import { editOutcomeTracker } from "../../extension/EditOutcomeTracker";
+
+
 import { VerticalDiffHandler, VerticalDiffHandlerOptions } from "./handler";
 import { getFirstChangedLine } from "./util";
 
@@ -146,7 +148,7 @@ export class VerticalDiffManager {
 
     void vscode.commands.executeCommand(
       "setContext",
-      "continue.diffVisible",
+      "continue-dify.diffVisible",
       false,
     );
 
@@ -211,7 +213,7 @@ export class VerticalDiffManager {
     streamId: string,
     toolCallId?: string,
   ) {
-    vscode.commands.executeCommand("setContext", "continue.diffVisible", true);
+    void vscode.commands.executeCommand("setContext", "continue-dify.diffVisible", true);
 
     // Get the current editor fileUri/range
     let editor = vscode.window.activeTextEditor;
@@ -265,9 +267,9 @@ export class VerticalDiffManager {
       );
     }
 
-    vscode.commands.executeCommand(
+    void vscode.commands.executeCommand(
       "setContext",
-      "continue.streamingDiff",
+      "continue-dify.streamingDiff",
       true,
     );
 
@@ -287,9 +289,9 @@ export class VerticalDiffManager {
         throw new Error(message);
       }
     } finally {
-      vscode.commands.executeCommand(
+      void vscode.commands.executeCommand(
         "setContext",
-        "continue.streamingDiff",
+        "continue-dify.streamingDiff",
         false,
       );
     }
@@ -301,7 +303,7 @@ export class VerticalDiffManager {
     streamId: string,
     toolCallId?: string,
   ) {
-    vscode.commands.executeCommand("setContext", "continue.diffVisible", true);
+    void vscode.commands.executeCommand("setContext", "continue-dify.diffVisible", true);
 
     const editor = vscode.window.activeTextEditor;
     if (!editor) {
@@ -377,7 +379,7 @@ export class VerticalDiffManager {
   }): Promise<string | undefined> {
     void vscode.commands.executeCommand(
       "setContext",
-      "continue.diffVisible",
+      "continue-dify.diffVisible",
       true,
     );
 
@@ -518,11 +520,11 @@ export class VerticalDiffManager {
 
     void vscode.commands.executeCommand(
       "setContext",
-      "continue.streamingDiff",
+      "continue-dify.streamingDiff",
       true,
     );
 
-    this.editDecorationManager.clear();
+    void this.editDecorationManager.clear();
 
     const abortManager = ApplyAbortManager.getInstance();
     const abortController = abortManager.get(fileUri);
@@ -563,7 +565,7 @@ export class VerticalDiffManager {
       this.enableDocumentChangeListener();
 
       if (abortController.signal.aborted) {
-        void vscode.commands.executeCommand("continue.rejectDiff");
+        void vscode.commands.executeCommand("continue-dify.rejectDiff");
       }
 
       const fileAfterEdit = `${prefix}${streamedLines.join("\n")}${suffix}`;
@@ -588,7 +590,7 @@ export class VerticalDiffManager {
     } finally {
       void vscode.commands.executeCommand(
         "setContext",
-        "continue.streamingDiff",
+        "continue-dify.streamingDiff",
         false,
       );
     }

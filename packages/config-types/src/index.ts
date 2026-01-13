@@ -61,6 +61,7 @@ export const modelDescriptionSchema = z.object({
     "nebius",
     "scaleway",
     "watsonx",
+    "dify",
   ]),
   model: z.string(),
   apiKey: z.string().optional(),

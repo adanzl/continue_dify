@@ -1,0 +1,82 @@
+# Continue Dify 配置文件
+# 详细文档: https://docs.continue.dev/reference/config
+
+# 模型配置
+models:
+  # Dify Chat 助手
+  - title: Dify Chat Assistant
+    provider: dify
+    model: chat
+    apiKey: app-Ekx2BvIixSEv6WKR72Htl8Sx
+    apiBase: https://api.dify.ai/v1
+    contextLength: 8000
+    completionOptions:
+      temperature: 0.7
+      maxTokens: 2048
+
+  # Dify Workflow
+  - title: Dify Workflow
+    provider: dify
+    model: workflow
+    apiKey: app-your-workflow-api-key-here
+    apiBase: https://api.dify.ai/v1
+    contextLength: 8000
+    completionOptions:
+      temperature: 0.7
+      maxTokens: 2048
+
+# 根据角色选择模型
+selectedModelByRole:
+  chat: Dify Chat Assistant
+  edit: Dify Chat Assistant
+
+# Tab 自动补全模型
+tabAutocompleteModel:
+  title: Dify Autocomplete
+  provider: dify
+  model: chat
+  apiKey: app-your-dify-api-key-here
+  apiBase: https://api.dify.ai/v1
+
+# 其他配置
+allowAnonymousTelemetry: false
+
+# 系统消息
+systemMessage: 你是一个专业的编程助手，精通多种编程语言和框架。
+
+# 自定义命令（可选）
+# customCommands:
+#   - name: "解释代码"
+#     prompt: "请详细解释这段代码的功能和实现原理：\n\n{{{ input }}}"
+#   - name: "优化代码"
+#     prompt: "请优化以下代码，提高其性能和可读性：\n\n{{{ input }}}"
+
+# 上下文提供者（可选）
+# contextProviders:
+#   - name: code
+#     params: {}
+#   - name: docs
+#     params: {}
+#   - name: diff
+#     params: {}
+#   - name: terminal
+#     params: {}
+#   - name: problems
+#     params: {}
+#   - name: folder
+#     params: {}
+#   - name: codebase
+#     params: {}
+
+# Slash 命令（可选）
+# slashCommands:
+#   - name: edit
+#     description: "编辑高亮的代码"
+#   - name: comment
+#     description: "为代码添加注释"
+#   - name: share
+#     description: "分享当前会话"
+#   - name: cmd
+#     description: "生成 shell 命令"
+#   - name: commit
+#     description: "生成 git commit 消息"

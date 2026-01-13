@@ -83,7 +83,7 @@ export class VsCodeIdeUtils {
   }
 
   showSuggestion(uri: vscode.Uri, range: Range, suggestion: string) {
-    showSuggestionInEditor(
+    void showSuggestionInEditor(
       uri,
       new vscode.Range(
         range.start.line,
@@ -229,7 +229,7 @@ export class VsCodeIdeUtils {
   }
 
   showVirtualFile(name: string, contents: string) {
-    vscode.workspace
+    void vscode.workspace
       .openTextDocument(
         vscode.Uri.parse(
           `${
@@ -238,7 +238,7 @@ export class VsCodeIdeUtils {
         ),
       )
       .then((doc) => {
-        vscode.window.showTextDocument(doc, { preview: false });
+        void vscode.window.showTextDocument(doc, { preview: false });
       });
   }
 
@@ -256,7 +256,7 @@ export class VsCodeIdeUtils {
     });
 
     // Add secret to VS Code settings
-    vscode.workspace
+    void vscode.workspace
       .getConfiguration(EXTENSION_NAME)
       .update(key, secret, vscode.ConfigurationTarget.Global);
 
@@ -268,9 +268,9 @@ export class VsCodeIdeUtils {
 
   acceptRejectSuggestion(accept: boolean, key: SuggestionRanges) {
     if (accept) {
-      acceptSuggestionCommand(key);
+      void acceptSuggestionCommand(key);
     } else {
-      rejectSuggestionCommand(key);
+      void rejectSuggestionCommand(key);
     }
   }
 
@@ -300,7 +300,7 @@ export class VsCodeIdeUtils {
       .filter((editor) => this.documentIsCode(editor.document.uri))
       .forEach((editor) => {
         if (URI.equal(editor.document.uri.toString(), uri.toString())) {
-          editor.document.save();
+          void editor.document.save();
         }
       });
   }
@@ -385,7 +385,7 @@ export class VsCodeIdeUtils {
     const session = vscode.debug.activeDebugSession;
 
     if (!session) {
-      vscode.window.showWarningMessage(
+      void vscode.window.showWarningMessage(
         "No active debug session found, therefore no debug context will be provided for the llm.",
       );
       return "";

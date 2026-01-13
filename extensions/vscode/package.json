@@ -1,7 +1,7 @@
 {
-  "name": "continue",
+  "name": "continue-dify",
   "icon": "media/icon.png",
-  "author": "Continue Dev, Inc",
+  "author": "Continue Dev, Inc (Dify Fork)",
   "version": "1.3.28",
   "repository": {
     "type": "git",
@@ -18,10 +18,10 @@
   "homepage": "https://continue.dev",
   "qna": "https://github.com/continuedev/continue/issues/new/choose",
   "license": "Apache-2.0",
-  "displayName": "Continue - open-source AI code agent",
+  "displayName": "Continue Dify - AI code agent with Dify integration",
   "pricing": "Free",
-  "description": "The leading open-source AI code agent",
-  "publisher": "Continue",
+  "description": "Continue fork with Dify API integration support",
+  "publisher": "ContinueDify",
   "engines": {
     "vscode": "^1.70.0",
     "node": ">=20.19.0"
@@ -52,8 +52,7 @@
   ],
   "activationEvents": [
     "onUri",
-    "onStartupFinished",
-    "onView:continueGUIView"
+    "onStartupFinished"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -86,64 +85,57 @@
     "configuration": {
       "title": "Continue",
       "properties": {
-        "continue.telemetryEnabled": {
-          "type": "boolean",
-          "default": true,
-          "markdownDescription": "Continue collects anonymous usage data, cleaned of PII, to help us improve the product for our users. Read more  at [continue.dev › Telemetry](https://docs.continue.dev/telemetry).",
-          "markdownDeprecationMessage": "This setting is deprecated and will be removed in a later version. Please use the _Telemetry > Allow Anonymous Telemetry_ setting in the extension's User Settings page.",
-          "deprecationMessage": "Please use the _Telemetry > Allow Anonymous Telemetry_ setting in the extension's User Settings page."
-        },
-        "continue.showInlineTip": {
+        "continue-dify.showInlineTip": {
           "type": "boolean",
           "default": true,
           "description": "Show inline suggestion to use the Continue keyboard shortcuts (e.g. \"Cmd/Ctrl L to select code, Cmd/Ctrl I to edit\")."
         },
-        "continue.disableQuickFix": {
+        "continue-dify.disableQuickFix": {
           "type": "boolean",
           "default": false,
           "description": "Disable the quick fix feature."
         },
-        "continue.enableQuickActions": {
+        "continue-dify.enableQuickActions": {
           "type": "boolean",
           "default": false,
           "markdownDescription": "Enable the experimental Quick Actions feature. Read our walkthrough to learn about configuration and how to share feedback: [continue.dev › Walkthrough: Quick Actions (experimental)](https://docs.continue.dev/customize/deep-dives/vscode-actions#quick-actions)"
         },
-        "continue.enableTabAutocomplete": {
+        "continue-dify.enableTabAutocomplete": {
           "type": "boolean",
           "default": true,
           "markdownDescription": "Enable Continue's tab autocomplete feature. Read our walkthrough to learn about configuration and how to share feedback: [continue.dev › Walkthrough: Tab Autocomplete (beta)](https://docs.continue.dev/features/tab-autocomplete)"
         },
-        "continue.enableNextEdit": {
+        "continue-dify.enableNextEdit": {
           "type": "boolean",
           "default": true,
           "markdownDescription": "Enable Continue's next edit feature. Read our docs to learn about configuration and how to share feedback: [continue.dev › Features › Autocomplete › Next Edit (experimental)](https://docs.continue.dev/features/autocomplete/next-edit)"
         },
-        "continue.pauseTabAutocompleteOnBattery": {
+        "continue-dify.pauseTabAutocompleteOnBattery": {
           "type": "boolean",
           "default": false,
           "markdownDescription": "Pause Continue's tab autocomplete feature when your battery is low."
         },
-        "continue.pauseCodebaseIndexOnStart": {
+        "continue-dify.pauseCodebaseIndexOnStart": {
           "type": "boolean",
           "default": false,
           "markdownDescription": "Pause Continue's codebase index on start."
         },
-        "continue.enableConsole": {
+        "continue-dify.enableConsole": {
           "type": "boolean",
           "default": false,
           "markdownDescription": "Enable a console to log and explore model inputs and outputs. It can be found in the bottom panel."
         },
-        "continue.remoteConfigServerUrl": {
+        "continue-dify.remoteConfigServerUrl": {
           "type": "string",
           "default": null,
           "markdownDescription": "If your team is set up to use shared configuration, enter the server URL here and your user token below to enable automatic syncing."
         },
-        "continue.userToken": {
+        "continue-dify.userToken": {
           "type": "string",
           "default": null,
           "markdownDescription": "If your team is set up to use shared configuration, enter your user token here and your server URL above to enable automatic syncing."
         },
-        "continue.remoteConfigSyncPeriod": {
+        "continue-dify.remoteConfigSyncPeriod": {
           "type": "number",
           "default": 60,
           "description": "The period of time in minutes between automatic syncs."
@@ -152,232 +144,232 @@
     },
     "commands": [
       {
-        "command": "continue.applyCodeFromChat",
+        "command": "continue-dify.applyCodeFromChat",
         "category": "Continue",
         "title": "Apply code from chat",
         "group": "Continue"
       },
       {
-        "command": "continue.acceptDiff",
+        "command": "continue-dify.acceptDiff",
         "category": "Continue",
         "title": "Accept Diff",
         "group": "Continue"
       },
       {
-        "command": "continue.rejectDiff",
+        "command": "continue-dify.rejectDiff",
         "category": "Continue",
         "title": "Reject Diff",
         "group": "Continue",
         "icon": "$(stop)"
       },
       {
-        "command": "continue.acceptVerticalDiffBlock",
+        "command": "continue-dify.acceptVerticalDiffBlock",
         "category": "Continue",
         "title": "Accept Vertical Diff Block",
         "group": "Continue"
       },
       {
-        "command": "continue.rejectVerticalDiffBlock",
+        "command": "continue-dify.rejectVerticalDiffBlock",
         "category": "Continue",
         "title": "Reject Vertical Diff Block",
         "group": "Continue"
       },
       {
-        "command": "continue.focusEdit",
+        "command": "continue-dify.focusEdit",
         "category": "Continue",
         "title": "Add to Edit",
         "group": "Continue"
       },
       {
-        "command": "continue.focusContinueInput",
+        "command": "continue-dify.focusContinueInput",
         "category": "Continue",
         "title": "Add Highlighted Code to Context and Clear Chat",
         "group": "Continue"
       },
       {
-        "command": "continue.focusContinueInputWithoutClear",
+        "command": "continue-dify.focusContinueInputWithoutClear",
         "category": "Continue",
         "title": "Add to Chat",
         "group": "Continue"
       },
       {
-        "command": "continue.debugTerminal",
+        "command": "continue-dify.debugTerminal",
         "category": "Continue",
         "title": "Debug Terminal",
         "group": "Continue"
       },
       {
-        "command": "continue.exitEditMode",
+        "command": "continue-dify.exitEditMode",
         "category": "Continue",
         "title": "Exit Edit Mode",
         "group": "Continue"
       },
       {
-        "command": "continue.openConfigPage",
+        "command": "continue-dify.openConfigPage",
         "category": "Continue",
         "title": "Open Settings",
         "icon": "$(gear)",
         "group": "Continue"
       },
       {
-        "command": "continue.toggleTabAutocompleteEnabled",
+        "command": "continue-dify.toggleTabAutocompleteEnabled",
         "category": "Continue",
         "title": "Toggle Autocomplete Enabled",
         "group": "Continue"
       },
       {
-        "command": "continue.forceAutocomplete",
+        "command": "continue-dify.forceAutocomplete",
         "title": "Continue: Force Autocomplete",
         "category": "Continue"
       },
       {
-        "command": "continue.selectFilesAsContext",
+        "command": "continue-dify.selectFilesAsContext",
         "category": "Continue",
         "title": "Select Files as Context",
         "group": "Continue"
       },
       {
-        "command": "continue.newSession",
+        "command": "continue-dify.newSession",
         "category": "Continue",
         "title": "New Session",
         "icon": "$(add)",
         "group": "Continue"
       },
       {
-        "command": "continue.shareSession",
+        "command": "continue-dify.shareSession",
         "category": "Continue",
         "title": "Share Current Chat Session as Markdown",
         "group": "Continue"
       },
       {
-        "command": "continue.viewHistory",
+        "command": "continue-dify.viewHistory",
         "category": "Continue",
         "title": "View History",
         "icon": "$(history)",
         "group": "Continue"
       },
       {
-        "command": "continue.viewLogs",
+        "command": "continue-dify.viewLogs",
         "category": "Continue",
         "title": "View Logs",
         "group": "Continue"
       },
       {
-        "command": "continue.clearConsole",
+        "command": "continue-dify.clearConsole",
         "category": "Continue",
         "title": "Clear Console",
         "icon": "$(clear-all)",
         "group": "Continue"
       },
       {
-        "command": "continue.navigateTo",
+        "command": "continue-dify.navigateTo",
         "category": "Continue",
         "title": "Navigate to a path",
         "group": "Continue"
       },
       {
-        "command": "continue.writeCommentsForCode",
+        "command": "continue-dify.writeCommentsForCode",
         "category": "Continue",
         "title": "Write Comments for this Code",
         "group": "Continue"
       },
       {
-        "command": "continue.writeDocstringForCode",
+        "command": "continue-dify.writeDocstringForCode",
         "category": "Continue",
         "title": "Write a Docstring for this Code",
         "group": "Continue"
       },
       {
-        "command": "continue.fixCode",
+        "command": "continue-dify.fixCode",
         "category": "Continue",
         "title": "Fix this Code",
         "group": "Continue"
       },
       {
-        "command": "continue.optimizeCode",
+        "command": "continue-dify.optimizeCode",
         "category": "Continue",
         "title": "Optimize this Code",
         "group": "Continue"
       },
       {
-        "command": "continue.fixGrammar",
+        "command": "continue-dify.fixGrammar",
         "category": "Continue",
         "title": "Fix Grammar / Spelling",
         "group": "Continue"
       },
       {
-        "command": "continue.codebaseForceReIndex",
+        "command": "continue-dify.codebaseForceReIndex",
         "category": "Continue",
         "title": "Codebase Force Re-Index",
         "group": "Continue"
       },
       {
-        "command": "continue.rebuildCodebaseIndex",
+        "command": "continue-dify.rebuildCodebaseIndex",
         "category": "Continue",
         "title": "Rebuild codebase index",
         "group": "Continue"
       },
       {
-        "command": "continue.docsIndex",
+        "command": "continue-dify.docsIndex",
         "category": "Continue",
         "title": "Docs Index",
         "group": "Continue"
       },
       {
-        "command": "continue.docsReIndex",
+        "command": "continue-dify.docsReIndex",
         "category": "Continue",
         "title": "Docs Force Re-Index",
         "group": "Continue"
       },
       {
-        "command": "continue.focusContinueInput",
+        "command": "continue-dify.focusContinueInput",
         "category": "Continue",
         "title": "Focus Continue Chat",
         "group": "Continue"
       },
       {
-        "command": "continue.enterEnterpriseLicenseKey",
+        "command": "continue-dify.enterEnterpriseLicenseKey",
         "category": "Continue",
         "title": "Enter Enterprise License Key",
         "group": "Continue"
       },
       {
-        "command": "continue.toggleNextEditEnabled",
+        "command": "continue-dify.toggleNextEditEnabled",
         "title": "Continue: Toggle Next Edit"
       },
       {
-        "command": "continue.nextEditWindow.hideNextEditSuggestion",
+        "command": "continue-dify.nextEditWindow.hideNextEditSuggestion",
         "category": "Continue",
         "title": "Hide Next Edit Suggestion"
       },
       {
-        "command": "continue.nextEditWindow.acceptNextEditSuggestion",
+        "command": "continue-dify.nextEditWindow.acceptNextEditSuggestion",
         "category": "Continue",
         "title": "Accept Next Edit Suggestion"
       },
       {
-        "command": "continue.forceNextEdit",
+        "command": "continue-dify.forceNextEdit",
         "category": "Continue",
         "title": "Continue: Force Next Edit"
       },
       {
-        "command": "continue.acceptJump",
+        "command": "continue-dify.acceptJump",
         "category": "Continue",
         "title": "Continue: Accept Jump Suggestion"
       },
       {
-        "command": "continue.rejectJump",
+        "command": "continue-dify.rejectJump",
         "category": "Continue",
         "title": "Continue: Reject Jump Suggestion"
       },
       {
-        "command": "continue.generateRule",
+        "command": "continue-dify.generateRule",
         "category": "Continue",
         "title": "Generate Rule",
         "group": "Continue"
       },
       {
-        "command": "continue.openInNewWindow",
+        "command": "continue-dify.openInNewWindow",
         "category": "Continue",
         "title": "Open in new window",
         "group": "Continue"
@@ -385,219 +377,219 @@
     ],
     "keybindings": [
       {
-        "command": "continue.focusContinueInput",
+        "command": "continue-dify.focusContinueInput",
         "mac": "cmd+l",
         "key": "ctrl+l"
       },
       {
-        "command": "continue.focusContinueInputWithoutClear",
+        "command": "continue-dify.focusContinueInputWithoutClear",
         "mac": "cmd+shift+l",
         "key": "ctrl+shift+l"
       },
       {
-        "command": "continue.acceptDiff",
+        "command": "continue-dify.acceptDiff",
         "mac": "shift+cmd+enter",
         "key": "shift+ctrl+enter",
-        "when": "continue.diffVisible"
+        "when": "continue-dify.diffVisible"
       },
       {
-        "command": "continue.rejectDiff",
+        "command": "continue-dify.rejectDiff",
         "mac": "shift+cmd+backspace",
         "key": "shift+ctrl+backspace",
-        "when": "continue.diffVisible"
+        "when": "continue-dify.diffVisible"
       },
       {
-        "command": "continue.rejectDiff",
+        "command": "continue-dify.rejectDiff",
         "mac": "cmd+z",
         "key": "ctrl+z",
-        "when": "continue.diffVisible"
+        "when": "continue-dify.diffVisible"
       },
       {
-        "command": "continue.quickEditHistoryUp",
+        "command": "continue-dify.quickEditHistoryUp",
         "mac": "up",
         "key": "up",
         "when": "false && continue.quickEditHistoryFocused"
       },
       {
-        "command": "continue.quickEditHistoryDown",
+        "command": "continue-dify.quickEditHistoryDown",
         "mac": "down",
         "key": "down",
         "when": "false && continue.quickEditHistoryFocused"
       },
       {
-        "command": "continue.acceptVerticalDiffBlock",
+        "command": "continue-dify.acceptVerticalDiffBlock",
         "mac": "alt+cmd+y",
         "key": "alt+ctrl+y"
       },
       {
-        "command": "continue.rejectVerticalDiffBlock",
+        "command": "continue-dify.rejectVerticalDiffBlock",
         "mac": "alt+cmd+n",
         "key": "alt+ctrl+n"
       },
       {
-        "command": "continue.focusEdit",
+        "command": "continue-dify.focusEdit",
         "title": "Edit code with natural language",
         "mac": "cmd+i",
         "key": "ctrl+i"
       },
       {
-        "command": "continue.exitEditMode",
+        "command": "continue-dify.exitEditMode",
         "mac": "escape",
         "key": "escape",
-        "when": "continue.inEditMode && editorFocus"
+        "when": "continue-dify.inEditMode && editorFocus"
       },
       {
-        "command": "continue.debugTerminal",
+        "command": "continue-dify.debugTerminal",
         "mac": "cmd+shift+r",
         "key": "ctrl+shift+r"
       },
       {
-        "command": "continue.openInNewWindow",
+        "command": "continue-dify.openInNewWindow",
         "mac": "cmd+k cmd+m",
         "key": "ctrl+k ctrl+m",
         "when": "!terminalFocus"
       },
       {
-        "command": "continue.toggleTabAutocompleteEnabled",
+        "command": "continue-dify.toggleTabAutocompleteEnabled",
         "mac": "cmd+k cmd+a",
         "key": "ctrl+k ctrl+a",
         "when": "!terminalFocus"
       },
       {
-        "command": "continue.forceAutocomplete",
+        "command": "continue-dify.forceAutocomplete",
         "key": "ctrl+alt+space",
         "mac": "cmd+alt+space",
         "when": "editorTextFocus && !editorHasSelection && !editorReadOnly && !inSnippetMode"
       },
       {
-        "command": "continue.applyCodeFromChat",
+        "command": "continue-dify.applyCodeFromChat",
         "mac": "alt+a",
         "key": "alt+a"
       },
       {
-        "command": "continue.toggleNextEditEnabled",
+        "command": "continue-dify.toggleNextEditEnabled",
         "key": "ctrl+k ctrl+n",
         "mac": "cmd+k cmd+n",
         "when": "editorTextFocus"
       },
       {
-        "command": "continue.nextEditWindow.hideNextEditSuggestion",
+        "command": "continue-dify.nextEditWindow.hideNextEditSuggestion",
         "key": "escape",
         "when": "editorTextFocus && nextEditWindowActive && !continue.jumpDecorationVisible"
       },
       {
-        "command": "continue.nextEditWindow.acceptNextEditSuggestion",
+        "command": "continue-dify.nextEditWindow.acceptNextEditSuggestion",
         "key": "tab",
         "when": "editorTextFocus && nextEditWindowActive && !continue.jumpDecorationVisible"
       },
       {
-        "command": "continue.acceptJump",
+        "command": "continue-dify.acceptJump",
         "key": "tab",
         "when": "editorTextFocus && continue.jumpDecorationVisible"
       },
       {
-        "command": "continue.rejectJump",
+        "command": "continue-dify.rejectJump",
         "key": "escape",
         "when": "editorTextFocus && continue.jumpDecorationVisible"
       }
     ],
     "submenus": [
       {
-        "id": "continue.continueSubMenu",
+        "id": "continue-dify.continueSubMenu",
         "label": "Continue"
       }
     ],
     "menus": {
       "commandPalette": [
         {
-          "command": "continue.focusContinueInput"
+          "command": "continue-dify.focusContinueInput"
         },
         {
-          "command": "continue.focusContinueInputWithoutClear"
+          "command": "continue-dify.focusContinueInputWithoutClear"
         },
         {
-          "command": "continue.debugTerminal"
+          "command": "continue-dify.debugTerminal"
         },
         {
-          "command": "continue.newSession"
+          "command": "continue-dify.newSession"
         },
         {
-          "command": "continue.enterEnterpriseLicenseKey"
+          "command": "continue-dify.enterEnterpriseLicenseKey"
         },
         {
-          "command": "continue.generateRule"
+          "command": "continue-dify.generateRule"
         },
         {
-          "command": "continue.openInNewWindow"
+          "command": "continue-dify.openInNewWindow"
         }
       ],
       "editor/context": [
         {
-          "submenu": "continue.continueSubMenu",
+          "submenu": "continue-dify.continueSubMenu",
           "group": "0_acontinue"
         }
       ],
       "editor/title/run": [
         {
-          "command": "continue.rejectDiff",
+          "command": "continue-dify.rejectDiff",
           "group": "Continue",
-          "when": "continue.streamingDiff"
+          "when": "continue-dify.streamingDiff"
         }
       ],
-      "continue.continueSubMenu": [
+      "continue-dify.continueSubMenu": [
         {
-          "command": "continue.focusContinueInputWithoutClear",
+          "command": "continue-dify.focusContinueInputWithoutClear",
           "group": "Continue"
         },
         {
-          "command": "continue.focusEdit",
+          "command": "continue-dify.focusEdit",
           "group": "Continue",
           "when": "!editorReadonly"
         }
       ],
       "explorer/context": [
         {
-          "command": "continue.selectFilesAsContext",
+          "command": "continue-dify.selectFilesAsContext",
           "group": "1_debug@1"
         }
       ],
       "view/title": [
         {
-          "command": "continue.newSession",
+          "command": "continue-dify.newSession",
           "group": "navigation@1",
-          "when": "view == continue.continueGUIView"
+          "when": "view == continue-dify.continueDifyGUIView"
         },
         {
-          "command": "continue.viewHistory",
+          "command": "continue-dify.viewHistory",
           "group": "navigation@2",
-          "when": "view == continue.continueGUIView"
+          "when": "view == continue-dify.continueDifyGUIView"
         },
         {
-          "command": "continue.openConfigPage",
+          "command": "continue-dify.openConfigPage",
           "group": "navigation@4",
-          "when": "view == continue.continueGUIView"
+          "when": "view == continue-dify.continueDifyGUIView"
         },
         {
-          "command": "continue.clearConsole",
+          "command": "continue-dify.clearConsole",
           "group": "navigation@1",
-          "when": "view == continue.continueConsoleView"
+          "when": "view == continue-dify.continueDifyConsoleView"
         }
       ],
       "editor/title": [
         {
-          "command": "continue.newSession",
+          "command": "continue-dify.newSession",
           "group": "navigation@1",
-          "when": "activeWebviewPanelId == continue.continueGUIView"
+          "when": "activeWebviewPanelId == continue-dify.continueDifyGUIView"
         },
         {
-          "command": "continue.viewHistory",
+          "command": "continue-dify.viewHistory",
           "group": "navigation@2",
-          "when": "activeWebviewPanelId == continue.continueGUIView"
+          "when": "activeWebviewPanelId == continue-dify.continueDifyGUIView"
         }
       ],
       "terminal/context": [
         {
-          "command": "continue.debugTerminal",
+          "command": "continue-dify.debugTerminal",
           "group": "navigation@top"
         }
       ]
@@ -605,43 +597,43 @@
     "viewsContainers": {
       "activitybar": [
         {
-          "id": "continue",
-          "title": "Continue",
+          "id": "continue-dify",
+          "title": "Continue Dify",
           "icon": "media/sidebar-icon.png"
         }
       ],
       "panel": [
         {
-          "id": "continueConsole",
-          "title": "Continue Console",
+          "id": "continue-dify-console",
+          "title": "Continue Dify Console",
           "icon": "$(window)"
         }
       ]
     },
     "views": {
-      "continue": [
+      "continue-dify": [
         {
           "type": "webview",
-          "id": "continue.continueGUIView",
-          "name": "Continue",
-          "icon": "media/sidebar-icon.png",
+          "id": "continue-dify.continueDifyGUIView",
+          "name": "Continue Dify",
+          "icon": "media/icon.png",
           "visibility": "visible"
         }
       ],
-      "continueConsole": [
+      "continue-dify-console": [
         {
           "type": "webview",
-          "id": "continue.continueConsoleView",
-          "name": "Continue Console",
+          "id": "continue-dify.continueDifyConsoleView",
+          "name": "Continue Dify Console",
           "icon": "$(window)",
           "visibility": "visible",
-          "when": "config.continue.enableConsole"
+          "when": "config.continue-dify.enableConsole"
         }
       ]
     },
     "jsonValidation": [
       {
-        "fileMatch": "**/.continue*/config.json",
+        "fileMatch": "**/.continue-dify*/config.json",
         "url": "./config_schema.json"
       },
       {
@@ -752,6 +744,7 @@
     "ignore": "^5.3.0",
     "jsdom": "^24.0.0",
     "lru-cache": "^11.0.2",
+    "mac-ca": "^3.1.3",
     "minisearch": "^7.0.0",
     "mocha": "^11.7.5",
     "monaco-editor": "^0.45.0",
@@ -765,8 +758,10 @@
     "read-last-lines": "^1.8.0",
     "request": "^2.88.2",
     "socket.io-client": "^4.7.2",
+    "sqlite3": "^5.1.7",
     "strip-ansi": "^7.1.0",
     "svg-builder": "^2.0.0",
+    "system-ca": "^2.0.1",
     "systeminformation": "^5.27.14",
     "tailwindcss": "^3.3.2",
     "undici": "^6.21.3",
@@ -775,8 +770,12 @@
     "vectordb": "0.4.20",
     "vitest": "^3.1.4",
     "vscode-languageclient": "^8.0.2",
+    "win-ca": "^3.5.1",
+    "winston": "^3.19.0",
     "ws": "^8.13.0",
-    "yarn": "^1.22.21"
+    "yaml": "^2.8.2",
+    "yarn": "^1.22.21",
+    "zod": "^4.3.5"
   },
   "overrides": {
     "vitest": {

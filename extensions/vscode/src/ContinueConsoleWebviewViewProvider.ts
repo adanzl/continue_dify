@@ -17,7 +17,7 @@ const MAX_INTERACTIONS = 50;
 export class ContinueConsoleWebviewViewProvider
   implements vscode.WebviewViewProvider
 {
-  public static readonly viewType = "continue.continueConsoleView";
+  public static readonly viewType = "continue-dify.continueDifyConsoleView";
 
   resolveWebviewView(
     webviewView: vscode.WebviewView,
@@ -155,8 +155,8 @@ export class ContinueConsoleWebviewViewProvider
     let scriptUri: string;
     let styleMainUri: string;
 
-    const inDevelopmentMode =
-      context?.extensionMode === vscode.ExtensionMode.Development;
+    // Always use production build, even in development mode
+    const inDevelopmentMode = false;
     if (inDevelopmentMode) {
       scriptUri = "http://localhost:5173/src/console.tsx";
       styleMainUri = "http://localhost:5173/src/indexConsole.css";
