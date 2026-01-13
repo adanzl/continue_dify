@@ -1,5 +1,14 @@
 {
-    "python-envs.defaultEnvManager": "ms-python.python:conda",
-    "python-envs.defaultPackageManager": "ms-python.python:conda",
-    "python-envs.pythonProjects": []
+  "files.exclude": {
+    "**/node_modules": true,
+    "**/.git": false,
+    "**/out": false
+  },
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/out": true,
+    "**/dist": true
+  },
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true
 }

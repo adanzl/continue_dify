@@ -1,0 +1,45 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "compile-vscode-extension",
+      "type": "shell",
+      "command": "npx",
+      "args": ["tsc", "-p", "./"],
+      "options": {
+        "cwd": "${workspaceFolder}/extensions/vscode"
+      },
+      "presentation": {
+        "reveal": "silent",
+        "panel": "shared"
+      },
+      "problemMatcher": ["$tsc"]
+    },
+    {
+      "label": "watch-vscode-extension",
+      "type": "shell",
+      "command": "npx",
+      "args": ["tsc", "-p", "./", "--watch"],
+      "options": {
+        "cwd": "${workspaceFolder}/extensions/vscode"
+      },
+      "isBackground": true,
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      },
+      "problemMatcher": ["$tsc-watch"]
+    },
+    {
+      "label": "compile-packages",
+      "type": "shell",
+      "command": "node",
+      "args": ["${workspaceFolder}/scripts/build-packages.js"],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    }
+  ]
+}

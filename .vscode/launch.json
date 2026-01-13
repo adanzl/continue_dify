@@ -1,0 +1,38 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Launch VSCode Extension (精简版)",
+      "type": "extensionHost",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/extensions/vscode",
+      "args": [
+        "--extensionDevelopmentPath=${workspaceFolder}/extensions/vscode"
+      ],
+      "pauseForSourceMap": false,
+      "outFiles": [
+        "${workspaceFolder}/extensions/vscode/out/**/*.js"
+      ],
+      "preLaunchTask": "compile-vscode-extension",
+      "env": {
+        "CONTINUE_GLOBAL_DIR": "${workspaceFolder}/.continue-debug"
+      }
+    },
+    {
+      "name": "Launch VSCode Extension (无预编译)",
+      "type": "extensionHost",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/extensions/vscode",
+      "args": [
+        "--extensionDevelopmentPath=${workspaceFolder}/extensions/vscode"
+      ],
+      "pauseForSourceMap": false,
+      "outFiles": [
+        "${workspaceFolder}/extensions/vscode/out/**/*.js"
+      ],
+      "env": {
+        "CONTINUE_GLOBAL_DIR": "${workspaceFolder}/.continue-debug"
+      }
+    }
+  ]
+}
