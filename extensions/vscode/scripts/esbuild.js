@@ -1,8 +1,8 @@
 const fs = require("fs");
 
-const { writeBuildTimestamp } = require("./utils");
-
 const esbuild = require("esbuild");
+
+const { writeBuildTimestamp } = require("./utils");
 
 const flags = process.argv.slice(2);
 

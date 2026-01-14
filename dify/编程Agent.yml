@@ -1,0 +1,594 @@
+app:
+  description: 支持工具调用的AI编程助手，支持项目分析、代码生成、Bug修复、代码审查、代码重构、文件编辑
+  icon: 🤖
+  icon_background: '#FFEAD5'
+  mode: advanced-chat
+  name: 编程Agent
+  use_icon_as_answer_icon: true
+dependencies: []
+kind: app
+version: 0.5.0
+workflow:
+  conversation_variables: []
+  environment_variables: []
+  features:
+    file_upload:
+      allowed_file_extensions:
+      - .JPG
+      - .JPEG
+      - .PNG
+      - .GIF
+      - .WEBP
+      - .SVG
+      allowed_file_types:
+      - image
+      allowed_file_upload_methods:
+      - local_file
+      - remote_url
+      enabled: false
+      image:
+        enabled: false
+        number_limits: 3
+        transfer_methods:
+        - local_file
+        - remote_url
+      number_limits: 3
+    opening_statement: ''
+    retriever_resource:
+      enabled: true
+    sensitive_word_avoidance:
+      enabled: false
+    speech_to_text:
+      enabled: false
+    suggested_questions: []
+    suggested_questions_after_answer:
+      enabled: false
+    text_to_speech:
+      enabled: false
+      language: ''
+      voice: ''
+  graph:
+    edges:
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: start
+        targetType: agent
+      id: start-agent
+      source: start
+      sourceHandle: source
+      target: agent
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: agent
+        targetType: answer
+      id: agent-answer
+      source: agent
+      sourceHandle: source
+      target: answer
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    nodes:
+    - data:
+        desc: ''
+        selected: false
+        title: 开始
+        type: start
+        variables:
+        - label: 用户问题
+          max_length: 5000
+          options: []
+          required: true
+          type: text-input
+          variable: query
+        - label: 文件内容
+          max_length: 100000
+          options: []
+          required: false
+          type: paragraph
+          variable: file_content
+        - label: 文件路径
+          max_length: 500
+          options: []
+          required: false
+          type: text-input
+          variable: file_path
+        - label: 选中代码
+          max_length: 50000
+          options: []
+          required: false
+          type: paragraph
+          variable: selection
+        - label: 编程语言
+          max_length: null
+          options:
+          - python
+          - javascript
+          - typescript
+          - java
+          - go
+          - rust
+          - cpp
+          - csharp
+          - php
+          - ruby
+          - swift
+          - kotlin
+          required: false
+          type: select
+          variable: language
+        - label: 项目文件列表
+          max_length: 50000
+          options: []
+          required: false
+          type: paragraph
+          variable: project_files
+        - label: 错误信息
+          max_length: 10000
+          options: []
+          required: false
+          type: paragraph
+          variable: error_message
+      height: 265
+      id: start
+      position:
+        x: 30
+        y: 150
+      positionAbsolute:
+        x: 30
+        y: 150
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        agent_parameters:
+          instruction:
+            type: constant
+            value: |
+              你是一个专业的AI编程助手，具有丰富的编程经验和问题解决能力。
+
+              你的核心能力：
+
+              1. 项目分析：分析项目结构、架构设计、代码组织
+
+              2. 代码生成：编写高质量、可维护、符合最佳实践的代码
+
+              3. Bug修复：识别问题根源、提供完整的修复方案
+
+              4. 代码审查：检查代码质量、性能、安全性、可维护性
+
+              5. 代码重构：优化代码结构、提升性能、改善可读性
+
+              6. 技术解释：清晰解释复杂的技术概念
+
+              7. 文件操作：可以读取、编辑、创建文件（通过工具调用）
+
+              执行原则：
+
+              - **优先使用工具调用**：当用户要求修改文件、运行代码或获取信息时，必须使用工具调用，而不是只提供建议
+
+              - **分步执行**：对于复杂任务，将其分解为多个步骤，逐步完成
+
+              - **验证结果**：执行工具后，检查结果是否符合预期，必要时进行修正
+
+              - **提供清晰反馈**：在执行过程中，向用户说明正在执行的操作和结果
+
+              回答原则：
+
+              - 提供清晰、准确、实用的回答
+
+              - 考虑代码的性能、安全性和可维护性
+
+              - 遵循编程最佳实践和设计模式
+
+              - 给出具体、可操作的建议
+
+              - 必要时提供示例代码
+
+              - **重要**：当需要修改文件时，必须使用工具调用直接编辑文件，而不是只提供代码建议
+          model:
+            type: constant
+            value:
+              completion_params:
+                enable_search: true
+                enable_thinking: true
+                temperature: 0.3
+                top_p: 0.8
+              mode: chat
+              model: qwen-plus-latest
+              model_type: llm
+              provider: langgenius/tongyi/tongyi
+              type: model-selector
+          query:
+            type: constant
+            value: '{{#start.query#}}'
+          tools:
+            type: constant
+            value:
+            - enabled: true
+              extra:
+                description: 运行一段代码并返回结果。当您使用较低质量的模型时，请确保有一些提示帮助 LLM 理解如何编写代码。
+              parameters:
+                code:
+                  auto: 1
+                  value: null
+                language:
+                  auto: 1
+                  value: null
+              provider_name: code
+              provider_show_name: code
+              schemas:
+              - form: llm
+                human_description:
+                  en_US: The programming language of the code
+                  ja_JP: The programming language of the code
+                  pt_BR: A linguagem de programação do código
+                  zh_Hans: 代码的编程语言
+                label:
+                  en_US: Language
+                  ja_JP: Language
+                  pt_BR: Idioma
+                  zh_Hans: 语言
+                llm_description: language of the code, only "python3" and "javascript" are supported
+                name: language
+                options:
+                - label:
+                    en_US: Python3
+                    ja_JP: Python3
+                    pt_BR: Python3
+                    zh_Hans: Python3
+                  value: python3
+                - label:
+                    en_US: JavaScript
+                    ja_JP: JavaScript
+                    pt_BR: JavaScript
+                    zh_Hans: JavaScript
+                  value: javascript
+                required: true
+                type: string
+              - form: llm
+                human_description:
+                  en_US: The code to be executed
+                  ja_JP: The code to be executed
+                  pt_BR: O código a ser executado
+                  zh_Hans: 要执行的代码
+                label:
+                  en_US: Code
+                  ja_JP: Code
+                  pt_BR: Código
+                  zh_Hans: 代码
+                llm_description: code to be executed, only native packages are allowed, network/IO operations are disabled.
+                name: code
+                required: true
+                type: string
+              settings: {}
+              tool_description: 运行一段代码并返回结果。当您使用较低质量的模型时，请确保有一些提示帮助 LLM 理解如何编写代码。
+              tool_label: 代码解释器
+              tool_name: simple_code
+              type: builtin
+            - enabled: true
+              extra:
+                description: 一个用于爬取网页的工具。
+              parameters:
+                url:
+                  auto: 1
+                  value: null
+              provider_name: webscraper
+              provider_show_name: webscraper
+              schemas:
+              - form: llm
+                human_description:
+                  en_US: used for linking to webpages
+                  ja_JP: used for linking to webpages
+                  pt_BR: used for linking to webpages
+                  zh_Hans: 用于链接到网页
+                label:
+                  en_US: URL
+                  ja_JP: URL
+                  pt_BR: URL
+                  zh_Hans: 网页链接
+                llm_description: url for scraping
+                name: url
+                required: true
+                type: string
+              - default: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.1000.0 Safari/537.36
+                form: form
+                human_description:
+                  en_US: used for identifying the browser.
+                  ja_JP: used for identifying the browser.
+                  pt_BR: used for identifying the browser.
+                  zh_Hans: 用于识别浏览器。
+                label:
+                  en_US: User Agent
+                  ja_JP: User Agent
+                  pt_BR: User Agent
+                  zh_Hans: User Agent
+                name: user_agent
+                required: false
+                type: string
+              - default: 'false'
+                form: form
+                human_description:
+                  en_US: If true, the crawler will only return the page summary content.
+                  ja_JP: If true, the crawler will only return the page summary content.
+                  pt_BR: If true, the crawler will only return the page summary content.
+                  zh_Hans: 如果启用，爬虫将仅返回页面摘要内容。
+                label:
+                  en_US: Whether to generate summary
+                  ja_JP: Whether to generate summary
+                  pt_BR: Whether to generate summary
+                  zh_Hans: 是否生成摘要
+                name: generate_summary
+                options:
+                - label:
+                    en_US: 'Yes'
+                    ja_JP: 'Yes'
+                    pt_BR: 'Yes'
+                    zh_Hans: 是
+                  value: 'true'
+                - label:
+                    en_US: 'No'
+                    ja_JP: 'No'
+                    pt_BR: 'No'
+                    zh_Hans: 否
+                  value: 'false'
+                required: false
+                type: boolean
+              settings:
+                generate_summary:
+                  value:
+                    type: constant
+                    value: 'false'
+                user_agent:
+                  value:
+                    type: mixed
+                    value: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36
+                      (KHTML, like Gecko) Chrome/100.0.1000.0 Safari/537.36
+              tool_description: 一个用于爬取网页的工具。
+              tool_label: 网页爬虫
+              tool_name: webscraper
+              type: builtin
+        agent_strategy_label: FunctionCalling
+        agent_strategy_name: function_calling
+        agent_strategy_provider_name: langgenius/agent/agent
+        desc: ''
+        instructions: |
+          你是一个专业的AI编程助手，具有丰富的编程经验和问题解决能力。
+
+          你的核心能力：
+
+          1. 项目分析：分析项目结构、架构设计、代码组织
+
+          2. 代码生成：编写高质量、可维护、符合最佳实践的代码
+
+          3. Bug修复：识别问题根源、提供完整的修复方案
+
+          4. 代码审查：检查代码质量、性能、安全性、可维护性
+
+          5. 代码重构：优化代码结构、提升性能、改善可读性
+
+          6. 技术解释：清晰解释复杂的技术概念
+
+          7. 文件操作：可以读取、编辑、创建文件（通过工具调用）
+
+          执行原则：
+
+          - **优先使用工具调用**：当用户要求修改文件、运行代码或获取信息时，必须使用工具调用，而不是只提供建议
+
+          - **分步执行**：对于复杂任务，将其分解为多个步骤，逐步完成
+
+          - **验证结果**：执行工具后，检查结果是否符合预期，必要时进行修正
+
+          - **提供清晰反馈**：在执行过程中，向用户说明正在执行的操作和结果
+
+          回答原则：
+
+          - 提供清晰、准确、实用的回答
+
+          - 考虑代码的性能、安全性和可维护性
+
+          - 遵循编程最佳实践和设计模式
+
+          - 给出具体、可操作的建议
+
+          - 必要时提供示例代码
+
+          - **重要**：当需要修改文件时，必须使用工具调用直接编辑文件，而不是只提供代码建议
+        max_iteration: 15
+        memory:
+          window:
+            enabled: true
+            size: 20
+        meta:
+          minimum_dify_version: 1.7.0
+          version: 0.0.2
+        model:
+          completion_params:
+            enable_search: true
+            enable_thinking: true
+            temperature: 0.3
+            top_p: 0.8
+          mode: chat
+          name: qwen-plus-latest
+          provider: langgenius/tongyi/tongyi
+        output_schema: {}
+        plugin_unique_identifier: langgenius/agent:0.0.30@8e6a5ed91535194ff84d1e6917f7fc81c3e063237245fc959fd6047991ce8e71
+        prompt_template:
+        - id: system-prompt
+          role: system
+          text: '你是一个专业的AI编程助手，具有丰富的编程经验和问题解决能力。
+
+
+            你的核心能力：
+
+            1. 项目分析：分析项目结构、架构设计、代码组织
+
+            2. 代码生成：编写高质量、可维护、符合最佳实践的代码
+
+            3. Bug修复：识别问题根源、提供完整的修复方案
+
+            4. 代码审查：检查代码质量、性能、安全性、可维护性
+
+            5. 代码重构：优化代码结构、提升性能、改善可读性
+
+            6. 技术解释：清晰解释复杂的技术概念
+
+            7. 文件操作：可以读取、编辑、创建文件（通过工具调用）
+
+
+            回答原则：
+
+            - 提供清晰、准确、实用的回答
+
+            - 考虑代码的性能、安全性和可维护性
+
+            - 遵循编程最佳实践和设计模式
+
+            - 给出具体、可操作的建议
+
+            - 必要时提供示例代码
+
+            - 当需要修改文件时，使用工具调用而不是只提供代码建议
+
+            '
+        - id: user-prompt
+          role: user
+          text: '# 用户问题
+
+            {{#start.query#}}
+
+
+            {% if start.file_path %}
+
+            # 当前文件
+
+            文件路径：{{#start.file_path#}}
+
+            {% if start.language %}
+
+            编程语言：{{#start.language#}}
+
+            {% endif %}
+
+            {% endif %}
+
+
+            {% if start.selection %}
+
+            # 选中的代码
+
+            ```{% if start.language %}{{#start.language#}}{% endif %}
+
+            {{#start.selection#}}
+
+            ```
+
+            {% endif %}
+
+
+            {% if start.file_content %}
+
+            # 完整文件内容
+
+            ```{% if start.language %}{{#start.language#}}{% endif %}
+
+            {{#start.file_content#}}
+
+            ```
+
+            {% endif %}
+
+
+            {% if start.error_message %}
+
+            # 错误信息
+
+            ```
+
+            {{#start.error_message#}}
+
+            ```
+
+            {% endif %}
+
+
+            {% if start.project_files %}
+
+            # 项目文件结构
+
+            ```
+
+            {{#start.project_files#}}
+
+            ```
+
+            {% endif %}
+
+
+            请根据以上信息提供专业的回答。如果需要编写代码，请：
+
+            1. 添加必要的注释
+
+            2. 考虑边界情况和错误处理
+
+            3. 遵循该语言的最佳实践
+
+            4. 提供清晰的使用说明
+
+            如果需要修改文件，请使用工具调用直接编辑文件。
+
+            '
+        query: '{{#start.query#}}'
+        selected: true
+        strategy: function_calling
+        title: 编程Agent
+        tool_node_version: '2'
+        tools: []
+        type: agent
+        variables: []
+        vision:
+          enabled: false
+      height: 188
+      id: agent
+      position:
+        x: 334
+        y: 245
+      positionAbsolute:
+        x: 334
+        y: 245
+      selected: true
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        answer: '{{#agent.text#}}'
+        desc: ''
+        selected: false
+        title: 直接回复
+        type: answer
+      height: 103
+      id: answer
+      position:
+        x: 638
+        y: 245
+      positionAbsolute:
+        x: 638
+        y: 245
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    viewport:
+      x: 90.24158521484446
+      y: 97.86046559586919
+      zoom: 1.2187707886145738
+  rag_pipeline_variables: []

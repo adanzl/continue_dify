@@ -36,7 +36,7 @@ export const EDIT_CODE_INSTRUCTIONS = `\
     // ... rest of function ...
   }
 
-  // ... rest of code ...
+  // ... rest of code ...0
   \`\`\`
 
   Since users have access to their complete file, they prefer reading only the

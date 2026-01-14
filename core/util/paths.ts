@@ -32,7 +32,8 @@ const CONTINUE_GLOBAL_DIR = (() => {
       ? configPath
       : path.resolve(process.cwd(), configPath);
   }
-  return path.join(os.homedir(), ".continue");
+  // Use .continue-dify instead of .continue to avoid conflicts with original Continue
+  return path.join(os.homedir(), ".continue-dify");
 })();
 
 // export const DEFAULT_CONFIG_TS_CONTENTS = `import { Config } from "./types"\n\nexport function modifyConfig(config: Config): Config {

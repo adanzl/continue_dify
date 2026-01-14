@@ -49,6 +49,7 @@ const PROVIDER_HANDLES_TEMPLATING: string[] = [
   "openai",
   "nvidia",
   "ollama",
+  "dify", // Dify API handles its own message formatting
   "together",
   "novita",
   "msty",

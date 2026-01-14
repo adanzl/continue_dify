@@ -8,7 +8,7 @@ models:
     provider: dify
     model: chat
     apiKey: app-Ekx2BvIixSEv6WKR72Htl8Sx
-    apiBase: https://api.dify.ai/v1
+    apiBase: https://leo-dify.tbit.top/v1
     contextLength: 8000
     completionOptions:
       temperature: 0.7
@@ -18,8 +18,8 @@ models:
   - name: Dify Workflow
     provider: dify
     model: workflow
-    apiKey: app-your-workflow-api-key-here
-    apiBase: https://api.dify.ai/v1
+    apiKey: app-Ekx2BvIixSEv6WKR72Htl8Sx
+    apiBase: https://leo-dify.tbit.top/v1
     contextLength: 8000
     completionOptions:
       temperature: 0.7
@@ -35,8 +35,8 @@ tabAutocompleteModel:
   title: Dify Autocomplete
   provider: dify
   model: chat
-  apiKey: app-your-dify-api-key-here
-  apiBase: https://api.dify.ai/v1
+  apiKey: app-Ekx2BvIixSEv6WKR72Htl8Sx
+  apiBase: https://leo-dify.tbit.top/v1
 
 # 其他配置
 allowAnonymousTelemetry: false

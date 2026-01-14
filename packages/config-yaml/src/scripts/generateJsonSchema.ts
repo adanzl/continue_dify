@@ -11,7 +11,12 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const jsonSchema = zodToJsonSchema(configYamlSchema, {
   $refStrategy: "none",
   name: "ConfigYaml",
-});
+}) as any;
+
+// Allow additional properties for backward compatibility with legacy JSON config fields
+if (jsonSchema.definitions?.ConfigYaml) {
+  jsonSchema.definitions.ConfigYaml.additionalProperties = true;
+}
 
 // Output directory and file path
 const outDir = path.resolve(__dirname, "../../schema");

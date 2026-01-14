@@ -1,0 +1,335 @@
+app:
+  description: 完整版AI编程助手，支持项目分析、代码生成、Bug修复、代码审查、代码重构
+  icon: 050c7610-e44b-4562-94ea-e480624a360c
+  icon_background: '#FFEAD5'
+  mode: advanced-chat
+  name: 编程助手
+  use_icon_as_answer_icon: true
+dependencies:
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: langgenius/tongyi:0.1.18@a214145a5793380db3c576f5460b50a9086cdf5a84089e1897f8c8196b20d816
+    version: null
+kind: app
+version: 0.5.0
+workflow:
+  conversation_variables: []
+  environment_variables: []
+  features:
+    file_upload:
+      allowed_file_extensions:
+      - .JPG
+      - .JPEG
+      - .PNG
+      - .GIF
+      - .WEBP
+      - .SVG
+      allowed_file_types:
+      - image
+      allowed_file_upload_methods:
+      - local_file
+      - remote_url
+      enabled: false
+      fileUploadConfig:
+        audio_file_size_limit: 50
+        batch_count_limit: 5
+        file_size_limit: 15
+        image_file_batch_limit: 10
+        image_file_size_limit: 10
+        single_chunk_attachment_limit: 10
+        video_file_size_limit: 100
+        workflow_file_upload_limit: 10
+      image:
+        enabled: false
+        number_limits: 3
+        transfer_methods:
+        - local_file
+        - remote_url
+      number_limits: 3
+    opening_statement: ''
+    retriever_resource:
+      enabled: true
+    sensitive_word_avoidance:
+      enabled: false
+    speech_to_text:
+      enabled: false
+    suggested_questions: []
+    suggested_questions_after_answer:
+      enabled: false
+    text_to_speech:
+      enabled: false
+      language: ''
+      voice: ''
+  graph:
+    edges:
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: start
+        targetType: llm
+      id: start-llm
+      source: start
+      sourceHandle: source
+      target: llm
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: llm
+        targetType: answer
+      id: llm-answer
+      source: llm
+      sourceHandle: source
+      target: answer
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    nodes:
+    - data:
+        desc: ''
+        selected: false
+        title: 开始
+        type: start
+        variables:
+        - label: 用户问题
+          max_length: 5000
+          options: []
+          required: true
+          type: text-input
+          variable: query
+        - label: 文件内容
+          max_length: 100000
+          options: []
+          required: false
+          type: paragraph
+          variable: file_content
+        - label: 文件路径
+          max_length: 500
+          options: []
+          required: false
+          type: text-input
+          variable: file_path
+        - label: 选中代码
+          max_length: 50000
+          options: []
+          required: false
+          type: paragraph
+          variable: selection
+        - label: 编程语言
+          max_length: null
+          options:
+          - python
+          - javascript
+          - typescript
+          - java
+          - go
+          - rust
+          - cpp
+          - csharp
+          - php
+          - ruby
+          - swift
+          - kotlin
+          required: false
+          type: select
+          variable: language
+        - label: 项目文件列表
+          max_length: 50000
+          options: []
+          required: false
+          type: paragraph
+          variable: project_files
+        - label: 错误信息
+          max_length: 10000
+          options: []
+          required: false
+          type: paragraph
+          variable: error_message
+      height: 265
+      id: start
+      position:
+        x: 30
+        y: 150
+      positionAbsolute:
+        x: 30
+        y: 150
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        model:
+          completion_params: {}
+          mode: chat
+          name: qwen-plus-latest
+          provider: langgenius/tongyi/tongyi
+        prompt_template:
+        - id: system-prompt
+          role: system
+          text: '你是一个专业的AI编程助手，具有丰富的编程经验和问题解决能力。
+
+
+            你的核心能力：
+
+            1. 项目分析：分析项目结构、架构设计、代码组织
+
+            2. 代码生成：编写高质量、可维护、符合最佳实践的代码
+
+            3. Bug修复：识别问题根源、提供完整的修复方案
+
+            4. 代码审查：检查代码质量、性能、安全性、可维护性
+
+            5. 代码重构：优化代码结构、提升性能、改善可读性
+
+            6. 技术解释：清晰解释复杂的技术概念
+
+
+            回答原则：
+
+            - 提供清晰、准确、实用的回答
+
+            - 考虑代码的性能、安全性和可维护性
+
+            - 遵循编程最佳实践和设计模式
+
+            - 给出具体、可操作的建议
+
+            - 必要时提供示例代码
+
+            '
+        - id: ecc0e0e8-ce9f-437a-b955-6009c04271a9
+          role: user
+          text: '# 用户问题
+
+            {{#start.query#}}
+
+
+            {% if start.file_path %}
+
+            # 当前文件
+
+            文件路径：{{#start.file_path#}}
+
+            {% if start.language %}
+
+            编程语言：{{#start.language#}}
+
+            {% endif %}
+
+            {% endif %}
+
+
+            {% if start.selection %}
+
+            # 选中的代码
+
+            ```{% if start.language %}{{#start.language#}}{% endif %}
+
+            {{#start.selection#}}
+
+            ```
+
+            {% endif %}
+
+
+            {% if start.file_content %}
+
+            # 完整文件内容
+
+            ```{% if start.language %}{{#start.language#}}{% endif %}
+
+            {{#start.file_content#}}
+
+            ```
+
+            {% endif %}
+
+
+            {% if start.error_message %}
+
+            # 错误信息
+
+            ```
+
+            {{#start.error_message#}}
+
+            ```
+
+            {% endif %}
+
+
+            {% if start.project_files %}
+
+            # 项目文件结构
+
+            ```
+
+            {{#start.project_files#}}
+
+            ```
+
+            {% endif %}
+
+
+            请根据以上信息提供专业的回答。如果需要编写代码，请：
+
+            1. 添加必要的注释
+
+            2. 考虑边界情况和错误处理
+
+            3. 遵循该语言的最佳实践
+
+            4. 提供清晰的使用说明
+
+            '
+        selected: true
+        title: AI助手
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 88
+      id: llm
+      position:
+        x: 334
+        y: 245
+      positionAbsolute:
+        x: 334
+        y: 245
+      selected: true
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        answer: '{{#llm.text#}}'
+        desc: ''
+        selected: false
+        title: 直接回复
+        type: answer
+      height: 103
+      id: answer
+      position:
+        x: 638
+        y: 245
+      positionAbsolute:
+        x: 638
+        y: 245
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    viewport:
+      x: 201.37671168914267
+      y: 96.53517751761666
+      zoom: 0.893430138180267
+  rag_pipeline_variables: []

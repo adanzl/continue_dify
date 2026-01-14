@@ -98,8 +98,8 @@ const envRecord = z.record(
 );
 
 export const baseConfigYamlSchema = z.object({
-  name: z.string(),
-  version: z.string(),
+  name: z.string().optional(),
+  version: z.string().optional(),
   schema: z.string().optional(),
   metadata: z.record(z.string()).and(commonMetadataSchema.partial()).optional(),
   env: envRecord.optional(),

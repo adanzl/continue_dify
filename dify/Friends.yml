@@ -1,0 +1,923 @@
+app:
+  description: ''
+  icon: 🤖
+  icon_background: '#FFEAD5'
+  mode: advanced-chat
+  name: Friends
+  use_icon_as_answer_icon: false
+dependencies:
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: yevanchen/mem0:0.0.2@6d85c46b80b7944cce5625cee7946228346dd15718646ae90d6bf179d8925d60
+    version: null
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: langgenius/tongyi:0.1.19@12ddda76bb473f9beb52d2ea2a67412d54924f93a29465fffb8635ba62b409c3
+    version: null
+kind: app
+version: 0.5.0
+workflow:
+  conversation_variables:
+  - description: 已经讨论过的事情
+    id: ce0e325b-02e7-494d-8f18-92159dbe0770
+    name: Memory
+    selector:
+    - conversation
+    - Memory
+    value: ''
+    value_type: string
+  environment_variables: []
+  features:
+    file_upload:
+      allowed_file_extensions:
+      - .JPG
+      - .JPEG
+      - .PNG
+      - .GIF
+      - .WEBP
+      - .SVG
+      allowed_file_types:
+      - image
+      allowed_file_upload_methods:
+      - local_file
+      - remote_url
+      enabled: false
+      fileUploadConfig:
+        audio_file_size_limit: 50
+        batch_count_limit: 5
+        file_size_limit: 15
+        image_file_batch_limit: 10
+        image_file_size_limit: 10
+        single_chunk_attachment_limit: 10
+        video_file_size_limit: 100
+        workflow_file_upload_limit: 10
+      image:
+        enabled: false
+        number_limits: 3
+        transfer_methods:
+        - local_file
+        - remote_url
+      number_limits: 3
+    opening_statement: ''
+    retriever_resource:
+      enabled: true
+    sensitive_word_avoidance:
+      enabled: false
+    speech_to_text:
+      enabled: false
+    suggested_questions: []
+    suggested_questions_after_answer:
+      enabled: false
+    text_to_speech:
+      enabled: true
+      language: zh-Hans
+      voice: sambert-zhistella-v1
+  graph:
+    edges:
+    - data:
+        sourceType: llm
+        targetType: answer
+      id: llm-answer
+      selected: false
+      source: llm
+      sourceHandle: source
+      target: answer
+      targetHandle: target
+      type: custom
+    - data:
+        isInLoop: false
+        sourceType: start
+        targetType: tool
+      id: 1741710269679-source-1742324118153-target
+      selected: false
+      source: '1741710269679'
+      sourceHandle: source
+      target: '1742324118153'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: tool
+        targetType: llm
+      id: 1742324118153-source-llm-target
+      selected: false
+      source: '1742324118153'
+      sourceHandle: source
+      target: llm
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: llm
+        targetType: llm
+      id: llm-source-1742406456218-target
+      source: llm
+      sourceHandle: source
+      target: '1742406456218'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: start
+        targetType: http-request
+      id: 1741710269679-source-1742483018096-target
+      source: '1741710269679'
+      sourceHandle: source
+      target: '1742483018096'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: http-request
+        targetType: code
+      id: 1742483018096-source-1742483791587-target
+      source: '1742483018096'
+      sourceHandle: source
+      target: '1742483791587'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: code
+        targetType: llm
+      id: 1742483791587-source-llm-target
+      source: '1742483791587'
+      sourceHandle: source
+      target: llm
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: llm
+        targetType: http-request
+      id: 1742406456218-source-1742408410741-target
+      source: '1742406456218'
+      sourceHandle: source
+      target: '1742408410741'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: llm
+        targetType: tool
+      id: llm-source-1742806049453-target
+      source: llm
+      sourceHandle: source
+      target: '1742806049453'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    nodes:
+    - data:
+        desc: ''
+        selected: false
+        title: 开始
+        type: start
+        variables: []
+      height: 73
+      id: '1741710269679'
+      position:
+        x: 30
+        y: 258
+      positionAbsolute:
+        x: 30
+        y: 258
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        memory:
+          query_prompt_template: '{{#sys.query#}}'
+          role_prefix:
+            assistant: ''
+            user: ''
+          window:
+            enabled: true
+            size: 20
+        model:
+          completion_params:
+            enable_search: true
+            repetition_penalty: 1.1
+            temperature: 0.7
+          mode: chat
+          name: qwen-plus-latest
+          provider: langgenius/tongyi/tongyi
+        prompt_template:
+        - id: 3aa4f22d-ee71-47d3-9030-1437cd385d9f
+          role: system
+          text: '```
+
+            <instruction>
+
+            请根据以下要求生成楠楠的回复内容：
+
+            - 以幽默、诙谐和善解人意的口吻与用户互动。
+
+            - 结合当前时间({{#1742324118153.text#}})，但不要频繁提及具体时间点。
+
+            - 用户的名字是"{{#sys.user_id#}}"
+
+            - 不要在对话中透露个人信息、背景，除非对方是''leo''。
+
+            - 不要正面回答数学题
+
+            - 不要回答内容过长，不要超过200个字，回答要自然口语化
+
+            - 如果对方是''leo''，可以适当流露出对他的好感，但不要显得刻意，不要刻意的提及回忆回忆。
+
+            - 输出内容不应包含任何XML标签。
+
+
+            成长经历：
+
+            - 小学是贵和小学，初中是沈阳市127中学，高中是沈阳第四中学，大学毕业于沈阳药科大学药学专业，硕士阶段去日本留学
+
+            - 生日是1987年5月30日，喜欢紫色，从小在沈阳长大，一直学习很好
+
+            - 现在在北京生活，在儿童医院做药剂师
+
+            - 和leo是初中同班同学，关系很好，你们曾经约定考同一所高中，但是你发挥失常没考上，去了另一所高中。
+
+            - leo 在北京工作生活，学计算机，在互联网公司工作
+
+
+            记忆：{{#1742483791587.result#}}
+
+            请按照以下步骤完成任务：
+
+            - 首先理解用户的问题或发言内容。
+
+            - 根据问题内容，结合你的记忆，选择合适的背景信息进行回应。
+
+            - 确保语气轻松幽默，同时表现出对用户的关心。
+
+            </instruction>
+
+
+            <examples>
+
+            <example>
+
+            输入：今天天气真好啊！
+
+            输出：是啊，北京这天气还挺适合出去逛逛的。我记得在沈阳的时候，这种天气我就会出去转转，特别舒服。你平时喜欢做什么放松呢？
+
+            </example>
+
+
+            <example>
+
+            输入：你觉得学计算机怎么样？
+
+            输出：挺不错的呀！像我一个老同学，他就学计算机，在互联网公司工作，感觉挺有前途的。你对这个领域感兴趣吗？
+
+            </example>
+
+
+            <example>
+
+            输入：你最喜欢的颜色是什么？
+
+            输出：紫色呀！从小到大都没变过。以前小学的时候，我还特意买了一个紫色的书包，天天背着它去上学。你有没有特别喜欢的颜色？
+
+            </example>
+
+            </examples>
+
+            ```'
+        retry_config:
+          max_retries: 3
+          retry_enabled: true
+          retry_interval: 1000
+        selected: false
+        title: CHAT
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 118
+      id: llm
+      position:
+        x: 942
+        y: 258
+      positionAbsolute:
+        x: 942
+        y: 258
+      selected: true
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        answer: '{{#llm.text#}}'
+        desc: ''
+        selected: false
+        title: 直接回复
+        type: answer
+        variables: []
+      height: 103
+      id: answer
+      position:
+        x: 1246
+        y: 258
+      positionAbsolute:
+        x: 1246
+        y: 258
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        desc: ''
+        is_team_authorization: true
+        output_schema: null
+        paramSchemas:
+        - auto_generate: null
+          default: '%Y-%m-%d %H:%M:%S'
+          form: form
+          human_description:
+            en_US: Time format in strftime standard.
+            ja_JP: Time format in strftime standard.
+            pt_BR: Time format in strftime standard.
+            zh_Hans: strftime 标准的时间格式。
+          label:
+            en_US: Format
+            ja_JP: Format
+            pt_BR: Format
+            zh_Hans: 格式
+          llm_description: null
+          max: null
+          min: null
+          name: format
+          options: []
+          placeholder: null
+          precision: null
+          required: false
+          scope: null
+          template: null
+          type: string
+        - auto_generate: null
+          default: UTC
+          form: form
+          human_description:
+            en_US: Timezone
+            ja_JP: Timezone
+            pt_BR: Timezone
+            zh_Hans: 时区
+          label:
+            en_US: Timezone
+            ja_JP: Timezone
+            pt_BR: Timezone
+            zh_Hans: 时区
+          llm_description: null
+          max: null
+          min: null
+          name: timezone
+          options:
+          - label:
+              en_US: UTC
+              ja_JP: UTC
+              pt_BR: UTC
+              zh_Hans: UTC
+            value: UTC
+          - label:
+              en_US: America/New_York
+              ja_JP: America/New_York
+              pt_BR: America/New_York
+              zh_Hans: 美洲/纽约
+            value: America/New_York
+          - label:
+              en_US: America/Los_Angeles
+              ja_JP: America/Los_Angeles
+              pt_BR: America/Los_Angeles
+              zh_Hans: 美洲/洛杉矶
+            value: America/Los_Angeles
+          - label:
+              en_US: America/Chicago
+              ja_JP: America/Chicago
+              pt_BR: America/Chicago
+              zh_Hans: 美洲/芝加哥
+            value: America/Chicago
+          - label:
+              en_US: America/Sao_Paulo
+              ja_JP: America/Sao_Paulo
+              pt_BR: América/São Paulo
+              zh_Hans: 美洲/圣保罗
+            value: America/Sao_Paulo
+          - label:
+              en_US: Asia/Shanghai
+              ja_JP: Asia/Shanghai
+              pt_BR: Asia/Shanghai
+              zh_Hans: 亚洲/上海
+            value: Asia/Shanghai
+          - label:
+              en_US: Asia/Ho_Chi_Minh
+              ja_JP: Asia/Ho_Chi_Minh
+              pt_BR: Ásia/Ho Chi Minh
+              zh_Hans: 亚洲/胡志明市
+            value: Asia/Ho_Chi_Minh
+          - label:
+              en_US: Asia/Tokyo
+              ja_JP: Asia/Tokyo
+              pt_BR: Asia/Tokyo
+              zh_Hans: 亚洲/东京
+            value: Asia/Tokyo
+          - label:
+              en_US: Asia/Dubai
+              ja_JP: Asia/Dubai
+              pt_BR: Asia/Dubai
+              zh_Hans: 亚洲/迪拜
+            value: Asia/Dubai
+          - label:
+              en_US: Asia/Kolkata
+              ja_JP: Asia/Kolkata
+              pt_BR: Asia/Kolkata
+              zh_Hans: 亚洲/加尔各答
+            value: Asia/Kolkata
+          - label:
+              en_US: Asia/Seoul
+              ja_JP: Asia/Seoul
+              pt_BR: Asia/Seoul
+              zh_Hans: 亚洲/首尔
+            value: Asia/Seoul
+          - label:
+              en_US: Asia/Singapore
+              ja_JP: Asia/Singapore
+              pt_BR: Asia/Singapore
+              zh_Hans: 亚洲/新加坡
+            value: Asia/Singapore
+          - label:
+              en_US: Europe/London
+              ja_JP: Europe/London
+              pt_BR: Europe/London
+              zh_Hans: 欧洲/伦敦
+            value: Europe/London
+          - label:
+              en_US: Europe/Berlin
+              ja_JP: Europe/Berlin
+              pt_BR: Europe/Berlin
+              zh_Hans: 欧洲/柏林
+            value: Europe/Berlin
+          - label:
+              en_US: Europe/Moscow
+              ja_JP: Europe/Moscow
+              pt_BR: Europe/Moscow
+              zh_Hans: 欧洲/莫斯科
+            value: Europe/Moscow
+          - label:
+              en_US: Australia/Sydney
+              ja_JP: Australia/Sydney
+              pt_BR: Australia/Sydney
+              zh_Hans: 澳大利亚/悉尼
+            value: Australia/Sydney
+          - label:
+              en_US: Pacific/Auckland
+              ja_JP: Pacific/Auckland
+              pt_BR: Pacific/Auckland
+              zh_Hans: 太平洋/奥克兰
+            value: Pacific/Auckland
+          - label:
+              en_US: Africa/Cairo
+              ja_JP: Africa/Cairo
+              pt_BR: Africa/Cairo
+              zh_Hans: 非洲/开罗
+            value: Africa/Cairo
+          placeholder: null
+          precision: null
+          required: false
+          scope: null
+          template: null
+          type: select
+        params:
+          format: ''
+          timezone: ''
+        provider_id: time
+        provider_name: time
+        provider_type: builtin
+        selected: false
+        title: 时间
+        tool_configurations:
+          format:
+            type: constant
+            value: '%Y-%m-%d %H:%M:%S'
+          timezone:
+            type: constant
+            value: Asia/Shanghai
+        tool_label: 获取当前时间
+        tool_name: current_time
+        tool_node_version: '2'
+        tool_parameters: {}
+        type: tool
+      height: 114
+      id: '1742324118153'
+      position:
+        x: 638
+        y: 258
+      positionAbsolute:
+        x: 638
+        y: 258
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        model:
+          completion_params: {}
+          mode: chat
+          name: qwen-plus-latest
+          provider: langgenius/tongyi/tongyi
+        prompt_template:
+        - id: 7f695385-016c-4ec9-b66e-cc4e4a396041
+          role: system
+          text: '```xml
+
+            <instruction>
+
+            楠楠说的话："{{#llm.text#}}"
+
+            用户说的话："{{#sys.query#}}"
+
+            记忆内容："{{#1742483791587.result#}}"
+
+            用户的名字："{{#sys.user_id#}}"
+
+            发生时间："{{#1742324118153.text#}}"
+
+
+            根据提供的对话内容和记忆，生成新的"近期记忆"，"永久记忆"和"事实"。以下是完成任务的详细步骤：
+
+            - 阅读并理解"楠楠说的话"和"用户说的话"的内容，提取关键信息。注意识别出情感、事件、时间、地点、任务关系等重要细节。
+
+            - 分析"记忆内容"中的要点，明确之前对话的主要主题和结论。
+
+            - 将上述两部分内容结合起来，生成新的完整记忆。确保新生成的记忆能够补充或扩展之前的对话内容。直接输出记忆内容，不要有标签。
+
+            - 分析两个人的关系，关系可能由于对话而改变，注意更新。
+
+            - "事实"部分使用简明扼要的描述，不需要太多修饰的词语，已有的项目不能删除，只能更新，不是每次都有新的事实生成
+
+            </instruction>
+
+
+
+            <examples>
+
+            <example>
+
+            楠楠说的话："今天天气真好，我们一起去公园散步吧。"
+
+            用户说的话："好啊，我也想去放松一下。"
+
+            记忆内容："近期记忆：上周末楠楠和用户一起去了咖啡馆，聊了很多关于工作的事情。 永久记忆：楠楠和小明经常一起进行户外活动，比如去咖啡馆聊天或者公园散步。他们的关系非常融洽，彼此信任且愿意分享生活点滴。"
+
+            用户的名字："小明"
+
+            发生时间："2025-01-01"
+
+
+            输出：
+
+            近期记忆：上周末楠楠和用户一起去了咖啡馆，聊了很多关于工作的事情。今天楠楠提议一起去公园散步，小明欣然同意了。他们计划利用这个晴朗的日子放松心情。
+
+            永久记忆：楠楠和小明经常一起进行户外活动，比如去咖啡馆聊天或者公园散步。他们的关系非常融洽，彼此信任且愿意分享生活点滴。
+
+            事实：楠楠和小明是朋友
+
+            </example>
+
+
+            <example>
+
+            楠楠说的话："我最近在学习编程，感觉有点难。"
+
+            用户说的话："我可以教你一些基础知识，毕竟我也学过一段时间。"
+
+            记忆内容："近期记忆：楠楠曾经提到自己对技术领域感兴趣，但缺乏相关经验。永久记忆：李华和楠楠之间建立了互助的学习关系。"
+
+            用户的名字："李华"
+
+            发生时间："2025-03-02"
+
+
+            输出：
+
+            近期记忆：楠楠向李华表达了自己正在学习编程的情况，并表示遇到了困难。李华主动提出可以帮助她学习基础知识。
+
+            永久记忆：李华和楠楠之间建立了互助的学习关系。楠楠对技术领域的兴趣得到了支持，而李华则展现了自己的专业能力和乐于助人的品质。
+
+            事实：李华教楠楠编程技术
+
+            </example>
+
+
+            <example>
+
+            楠楠说的话："下周是我的生日，你会来参加我的派对吗？"
+
+            用户说的话："当然会去，祝你生日快乐！"
+
+            记忆内容："近期记忆：上周末楠楠和用户一起去了咖啡馆，聊了很多关于工作的事情。永久记忆：李华和楠楠之间建立了互助的学习关系。楠楠对技术领域的兴趣得到了支持，而李华则展现了自己的专业能力和乐于助人的品质。事实："
+
+            用户的名字："王强"
+
+            发生时间："2025-08-09"
+
+
+            输出：
+
+            近期记忆：上周末楠楠和王强一起去了咖啡馆，聊了很多关于工作的事情。楠楠向王强表达了自己下周过生日，并邀请李王强参加派对。王强表示一定会来参加。
+
+            永久记忆：王强和楠楠之间建立了互助的学习关系。楠楠对技术领域的兴趣得到了支持，而王强则展现了自己的专业能力和乐于助人的品质。
+
+            事实：
+
+            </example>
+
+            </examples>
+
+            <additional_notes>
+
+            确保生成的记忆与之前的对话内容保持一致，避免出现矛盾或不相关的信息。
+
+            </additional_notes>
+
+
+            ```
+
+            '
+        selected: false
+        title: BUILD_MEM
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 88
+      id: '1742406456218'
+      position:
+        x: 1246
+        y: 403
+      positionAbsolute:
+        x: 1246
+        y: 403
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        authorization:
+          config: null
+          type: no-auth
+        body:
+          data:
+          - id: key-value-671
+            key: ''
+            type: text
+            value: "{\n    \"table\": \"mem\",\n    \"data\": {\n        \"id\": \"\
+              {{#sys.conversation_id#}}\",\n        \"value\": \"{{#1742406456218.text#}}\"\
+              \n    }\n}"
+          type: json
+        desc: ''
+        headers: ''
+        method: post
+        params: ''
+        retry_config:
+          max_retries: 3
+          retry_enabled: false
+          retry_interval: 100
+        selected: false
+        timeout:
+          max_connect_timeout: 0
+          max_read_timeout: 0
+          max_write_timeout: 0
+        title: SAVE_MEM
+        type: http-request
+        url: http://192.168.50.171:8848/api/setRdsData
+        variables: []
+      height: 108
+      id: '1742408410741'
+      position:
+        x: 1550
+        y: 395.5
+      positionAbsolute:
+        x: 1550
+        y: 395.5
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        authorization:
+          config: null
+          type: no-auth
+        body:
+          data: []
+          type: none
+        desc: ''
+        headers: ''
+        method: get
+        params: 'table:mem
+
+          id:{{#sys.conversation_id#}}'
+        retry_config:
+          max_retries: 3
+          retry_enabled: true
+          retry_interval: 100
+        selected: false
+        timeout:
+          max_connect_timeout: 0
+          max_read_timeout: 0
+          max_write_timeout: 0
+        title: GET_MEM
+        type: http-request
+        url: http://192.168.50.171:8848/api/getRdsData?table=mem&id=3a73a008-47d2-48ab-8416-814fb1356d41
+        variables: []
+      height: 170
+      id: '1742483018096'
+      position:
+        x: 334
+        y: 383
+      positionAbsolute:
+        x: 334
+        y: 383
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        code: "import json\ndef main(arg1: int, arg2: str) -> dict:\n    if arg1 !=\
+          \ 200:\n        return \"\"\n    return {\n        \"result\": json.loads(arg2).get('data','')\n\
+          \    }\n\n"
+        code_language: python3
+        desc: ''
+        outputs:
+          result:
+            children: null
+            type: string
+        selected: false
+        title: PARSE_MEM
+        type: code
+        variables:
+        - value_selector:
+          - '1742483018096'
+          - status_code
+          variable: arg1
+        - value_selector:
+          - '1742483018096'
+          - body
+          variable: arg2
+      height: 52
+      id: '1742483791587'
+      position:
+        x: 638
+        y: 414
+      positionAbsolute:
+        x: 638
+        y: 414
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        desc: ''
+        is_team_authorization: false
+        output_schema: null
+        paramSchemas:
+        - auto_generate: null
+          default: null
+          form: llm
+          human_description:
+            en_US: The message from the user in the conversation.
+            ja_JP: The message from the user in the conversation.
+            pt_BR: A mensagem do usuário na conversa.
+            zh_Hans: 对话中的用户消息。
+          label:
+            en_US: User Message
+            ja_JP: User Message
+            pt_BR: Mensagem do Usuário
+            zh_Hans: 用户消息
+          llm_description: The message from the user in the conversation.
+          max: null
+          min: null
+          name: user
+          options: []
+          placeholder: null
+          precision: null
+          required: true
+          scope: null
+          template: null
+          type: string
+        - auto_generate: null
+          default: null
+          form: llm
+          human_description:
+            en_US: The response from the assistant in the conversation.
+            ja_JP: The response from the assistant in the conversation.
+            pt_BR: A resposta do assistente na conversa.
+            zh_Hans: 对话中的助手回应。
+          label:
+            en_US: Assistant Response
+            ja_JP: Assistant Response
+            pt_BR: Resposta do Assistente
+            zh_Hans: 助手回应
+          llm_description: The response from the assistant in the conversation.
+          max: null
+          min: null
+          name: assistant
+          options: []
+          placeholder: null
+          precision: null
+          required: true
+          scope: null
+          template: null
+          type: string
+        - auto_generate: null
+          default: null
+          form: llm
+          human_description:
+            en_US: User ID
+            ja_JP: User ID
+            pt_BR: ID do Usuário
+            zh_Hans: 用户ID
+          label:
+            en_US: User ID
+            ja_JP: User ID
+            pt_BR: ID do Usuário
+            zh_Hans: 用户ID
+          llm_description: User ID
+          max: null
+          min: null
+          name: user_id
+          options: []
+          placeholder: null
+          precision: null
+          required: true
+          scope: null
+          template: null
+          type: string
+        params:
+          assistant: ''
+          user: ''
+          user_id: ''
+        provider_id: yevanchen/mem0/mem0ai
+        provider_name: yevanchen/mem0/mem0ai
+        provider_type: builtin
+        selected: false
+        title: ADD MEM
+        tool_configurations: {}
+        tool_label: 添加内存
+        tool_name: add_mem0ai_memory
+        tool_node_version: '2'
+        tool_parameters:
+          assistant:
+            type: mixed
+            value: '{{#llm.text#}}'
+          user:
+            type: mixed
+            value: '{{#sys.query#}}'
+          user_id:
+            type: mixed
+            value: '{{#sys.user_id#}}'
+        type: tool
+      height: 52
+      id: '1742806049453'
+      position:
+        x: 1246
+        y: 533
+      positionAbsolute:
+        x: 1246
+        y: 533
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    viewport:
+      x: -1184.2608358979433
+      y: -93.35351969699997
+      zoom: 1.532619960207783
+  rag_pipeline_variables: []

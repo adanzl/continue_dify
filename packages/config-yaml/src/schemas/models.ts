@@ -150,10 +150,12 @@ const baseModelFields = {
   model: z.string(),
   apiKey: z.string().optional(),
   apiBase: z.string().optional(),
+  contextLength: z.number().optional(), // Legacy field, also available in defaultCompletionOptions
   maxStopWords: z.number().optional(),
   roles: modelRolesSchema.array().optional(),
   capabilities: modelCapabilitySchema.array().optional(),
   defaultCompletionOptions: completionOptionsSchema.optional(),
+  completionOptions: completionOptionsSchema.optional(), // Legacy alias for defaultCompletionOptions
   cacheBehavior: cacheBehaviorSchema.optional(),
   requestOptions: requestOptionsSchema.optional(),
   embedOptions: embedOptionsSchema.optional(),
